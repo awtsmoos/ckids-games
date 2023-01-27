@@ -1,0 +1,72 @@
+B"H
+<br>
+<script src="../awtsmoosGames.js"></script>
+<script>
+    var ol = new Oyluhm({
+        printKeys: true
+    });
+
+    
+    function boyray() {
+        requestAnimationFrame(boyray);
+        ol.Heeshawvoos();
+    }
+
+    boyray();
+    var tseepoor = new AWTSMOOS.Neevrah({
+        x:7,
+        y:100,
+        width:126,
+        height:63,
+        heesCheel(me, olam) {
+            me.xSpeed = 0;
+            me.ySpeed = 0;
+
+            me.speedAmount = 2.6;
+            me.soyvevSpeed = 1.7;
+        },
+        heesHawvoos(me, olam) {
+            me.xSpeed = 
+            me.ySpeed = 0;
+            
+            if(
+                olam
+                .keys[
+                    "ArrowUp"
+                ] ||
+                olam.keys[
+                    "ArrowRight"
+                ]
+            ) {
+                me.poyneh -= me.soyvevSpeed
+                
+            }
+
+            if(
+                olam
+                .keys[
+                    "ArrowDown"
+                ] ||
+                olam.keys[
+                    "ArrowLeft"
+                ]
+            ) {
+                me.poyneh += me.soyvevSpeed
+                
+            }
+            
+            me.ySpeed = Math.sin(
+                me.poyneh * (
+                    Math.PI / 180
+                )
+            ) * me.speedAmount;
+
+            me.x += me.xSpeed;
+            me.y += me.ySpeed;
+            
+        }
+    })
+
+    ol.BoyrayNeevrah(tseepoor);
+
+</script>
