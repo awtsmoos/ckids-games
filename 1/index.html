@@ -3,29 +3,49 @@ B"H
 <script src="../awtsmoosGames.js"></script>
 <script>
     var ol = new Oyluhm({
-        printKeys: true
+        printKeys: true,
+        achbar:1
     });
 
     
     function boyray() {
         requestAnimationFrame(boyray);
-        ol.Heeshawvoos();
+        ol.HeesHawvoos();
     }
 
     boyray();
-    var tseepoor = new AWTSMOOS.Neevrah({
-        x:7,
+    var tseepoor = new AWTSMOOS.Domem({
+        x:17,
         y:100,
         width:126,
         height:63,
+        layer:0,
+        origin: me=>({
+            
+            y: -me.height/2
+        }),
         heesCheel(me, olam) {
             me.xSpeed = 0;
             me.ySpeed = 0;
 
-            me.speedAmount = 2.6;
-            me.soyvevSpeed = 1.7;
+            me.speedAmount = 4.8;
+            me.soyvevSpeed = 4.3;
+
+            me.achbarVectorX = 0;
+            me.achbarVectorY = 0;
+
+            me.sovevLiHawsayv/*angle to turn to*/   
+                 = 0;
+            me.meen = "me"
+
+            me.echad = 0;
+            me.lastTime = Date.now();
+
+            awsayAwnawn()
         },
+
         heesHawvoos(me, olam) {
+            
             me.xSpeed = 
             me.ySpeed = 0;
             
@@ -35,8 +55,9 @@ B"H
                     "ArrowUp"
                 ] ||
                 olam.keys[
-                    "ArrowRight"
+                    "ArrowLeft"
                 ]
+
             ) {
                 me.poyneh -= me.soyvevSpeed
                 
@@ -47,14 +68,84 @@ B"H
                 .keys[
                     "ArrowDown"
                 ] ||
+                
                 olam.keys[
-                    "ArrowLeft"
+                    "ArrowRight"
                 ]
             ) {
                 me.poyneh += me.soyvevSpeed
                 
             }
+
+            if(
+                olam
+                .achbar
+                .clicked
+            ) {
+                
+                me.achbarVectorX = (
+                    olam.achbar.x - 
+                    me.x
+                )
+
+                me.achbarVectorY = (
+                    olam.achbar.y - 
+                    me.y
+                )
+
+                me.sovevLiHawsayv = Math.atan2(
+                    me.achbarVectorY,
+                    me.achbarVectorX
+                ) * 180/Math.PI;
+
+                var p = me.poyneh;
+                var s = me.sovevLiHawsayv;
+                if(
+                    me.poyneh < 
+                    me.sovevLiHawsayv -
+                    me.soyvevSpeed
+                ) {
+                    console.log(3)
+                    me.poyneh += me.soyvevSpeed
+                }
+
+                else if(
+                    me.poyneh > 
+                    me.sovevLiHawsayv + 
+                    me.soyvevSpeed
+                ) {
+                    me.poyneh -= me.soyvevSpeed
+                    console.log(54)
+                } else {
+                    me.poyneh = me.sovevLiHawsayv
+                }
+            }
+
+            if(
+                me.poyneh < -60
+            ) {
+                me.poyneh = -60
+            }
+
+            if(me.poyneh > 60) {
+                me.poyneh = 60;
+            }
             
+            if(
+                me.y < 
+                me.height
+            ) {
+                me.y = me.height
+            }
+
+            if(
+                me.y + 
+                me.height >
+                olam.height
+            ) {
+                me.y = olam.height - me.height
+            }
+           // console.log(me.y)
             me.ySpeed = Math.sin(
                 me.poyneh * (
                     Math.PI / 180
@@ -63,10 +154,72 @@ B"H
 
             me.x += me.xSpeed;
             me.y += me.ySpeed;
+            me.gawvawn = "blue"
+
+            for(
+                me.echad = 0;
+                me.echad < ol.neevrayim.length;
+                me.echad++
+            ) {
+                if(
+                    ol.neevrayim[me.echad].meen ==
+                    me.meen
+                ) {
+                    
+                    continue;
+                }
+                if(
+                    AWTSMOOS.Gawshmeeyoos.hittest(
+                        me,
+                        ol.neevrayim[me.echad]
+                    )
+                ) {
+                    me.gawvawn = "yellow"
+                }
+            }
+            
+            if(
+                Date.now() -
+                me.lastTime > 3400
+            ) {
+                console.log(3);
+                me.lastTime = Date.now()
+                awsayAwnawn()
+            }
             
         }
     })
 
+    function awsayAwnawn() {
+        var cloudRadius = 200;
+        var cloudSpeed = 5;
+        var awnawn = new AWTSMOOS.Domem({
+            choymer: "eegool",
+            layer:1,
+            y: AWTSMOOS.Gawshmeeyoos.neekreh(
+                cloudRadius * 2,
+                ol.height -
+                cloudRadius
+            ),
+            x: ol.width + cloudRadius,
+            width:cloudRadius*2,
+            height:cloudRadius*2,
+
+            color:"gray",
+            heesHawvoos(me, olam) {
+                me.x -= cloudSpeed;
+                if(me.x < -me.width) {
+                    ol.Sealayk(me)
+                }
+            }
+        })
+        console.log(awnawn.x,awnawn.y)
+        ol.BoyrayNeevrah(awnawn)
+        return awnawn;
+    }
+
     ol.BoyrayNeevrah(tseepoor);
+
+   
 
 </script>

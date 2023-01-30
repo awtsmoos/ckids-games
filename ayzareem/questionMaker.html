@@ -1,0 +1,136 @@
+<h1>B"H</h1>
+<style>
+    #qsts  div{
+        display:block;
+        padding:15px;
+        margin-left:10px;
+        margin-top:15px;
+        border:1px solid black;
+    }
+
+    #qsts > div:nth-child(odd) {
+        background:yellow;
+
+    }
+</style>
+<h4>This is where the questions for the game can be made
+    and edited, IY"H
+</h4>
+<input id="opent" type="file"><label for="opent">Open existing questions file</label>
+<br>
+<br>
+<div id="edt">
+    <button id="adn">Add New question</button>
+    <button id="sv">Save question and answers</button>
+    <br><br><br>
+ 
+    
+    <div id="qsts">
+
+    </div>
+</div>
+<script>
+    var questions = {
+
+    }
+
+    sv.onclick = () => {
+        var ch = Array.from(qsts.children)
+            .map(ch => {
+                console.log(r=ch)
+                var qn = ch.getElementsByClassName("shaymShaweeluh")[0];
+                if(!qn) return;
+
+                console.log(qn.value)
+                var ans = Array.from(
+                    ch.getElementsByClassName("shaymMayeenuh")
+                ).map(q=>({
+                    text: q.value,
+                    isRight: (rght=>rght?(console.log(rght,t=q,g=q.parentNode),rght.checked):false)(q
+                        .parentNode
+                        .getElementsByClassName("ymeen")[0])
+                }));
+
+                return {
+                    question: qn.value,
+                    answerOptions: ans
+                }
+
+            })
+        var url = URL.createObjectURL(
+            new Blob(["//B\"H<br><script>\n"
+                +"if(!window.awtsmoosShaweeluh)"
+                +"awtsmoosShaweeluh=(d)=>console.log(r=d);\n"
+                +"awtsmoosShaweeluh("+
+                JSON.stringify(ch)
+                +");\n//</scr"+"ipt>"
+            ],{
+                type: "text/html"
+            })
+        )
+
+        var a = document.createElement("a")
+        a.href=url;
+        a.download="BH_Questions_And_Answer_Options_"
+            +Date.now()
+            +".html"
+        a.click()
+        console.log(w=ch)
+    }
+
+    adn.onclick = () => {
+        addQuestion()
+    }
+
+    function addQuestion() {
+        var qstH/*questionHolder*/=
+            document.createElement("div");
+
+        var qt = document.createElement("input")
+        qt.placeholder="Enter a question title";
+        qt.className = "shaymShaweeluh"
+
+        var ansOp = document.createElement("button");
+        ansOp.innerHTML = "Add answer option"
+
+        qstH.appendChild(qt);
+        qstH.appendChild(ansOp);
+        qsts.appendChild(qstH);
+
+        var opts = document.createElement("div")//options
+
+        qstH.appendChild(opts)
+
+        ansOp.onclick = () => {
+            var op = document.createElement("div")
+            op.className="qOption"
+            opts.appendChild(op)
+
+            var inpDiv = document.createElement("div")
+            op.appendChild(inpDiv)
+            var tx = document.createElement("input")
+            tx.className = "shaymMayeenuh"
+            tx.placeholder="Enter answer option text"
+            op.appendChild(tx)
+
+            var isRight = document.createElement("input")
+            isRight.type="checkbox"
+            isRight.className="ymeen"//right
+
+            isRight.checked=false;
+            var id = "BH_"+Date.now() + "_"
+                +Math.floor(Math.random()*810293);
+            isRight.id = id;
+
+            var lb = document.createElement("label")
+            lb.setAttribute("for",id)
+            lb.innerHTML = "Is this answer correct?"
+
+            inpDiv.appendChild(lb)
+            inpDiv.appendChild(isRight)
+            
+            
+        };
+    }
+    
+</script>

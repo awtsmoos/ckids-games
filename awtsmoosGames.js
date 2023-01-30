@@ -61,32 +61,30 @@ function Oyluhm(opts={}) {
     zeh.neevrayim = [];
     zeh.keys = [];
 
+    var layers = [];
+    this.layers =layers
     this.printKeys = opts.printKeys || false;
-    addEventListener("keydown", e=> {
-        zeh.keys[
-            e.key
-        ] = true;
-        
-    })
 
-    addEventListener("keyup", e=>{
-        zeh.keys[
-            e.key
-        ] = false;
-        if(
-            this.printKeys
-        ) {
-            console.log(e.key)
+    
+
+    
+    zeh.Sealayk = nivra => {
+        var ind = zeh.neevrayim.indexOf(nivra);
+        if(ind > -1) {
+            zeh.neevrayim.splice(ind, 1)
         }
-    })
-
+    }
     zeh.BoyrayNeevrah = nivra => {
         var exists = zeh.neevrayim.indexOf(nivra);
         if(exists < 0) {
             zeh.neevrayim.push(nivra)
+            if(!zeh.layers[nivra.layer]) {
+                zeh.layers[nivra.layer] = [];
+            }
+            zeh.layers[nivra.layer].push(nivra)
             if(typeof(
-                nivra.heesCheel == "function"
-            )) {
+                nivra.heesCheel
+            ) == "function") {
                 nivra.heesCheel(
                     nivra, zeh
                 )
@@ -94,19 +92,81 @@ function Oyluhm(opts={}) {
             resize();
         }
     }
+    var _frames = 0;
+    zeh.HeesHawvoos = () => {
+        
+        
+        AWTSMOOS.HeesHawvehNeevrah2d(zeh)
+        
 
-    zeh.Heeshawvoos = () => {
-        ctx.clearRect(
-            0,0,
-            ctx.canvas.width,
-            ctx.canvas.height
-        )
-        ctx.fillStyle = "black"
-        zeh.neevrayim.forEach(n => {
-            AWTSMOOS.HeesHawvehNeevrah2d(n, zeh)
-        })
+        _frames++;
     };
     resize();
+
+    var _mouseOptions = opts.mouse || opts.achbar;
+    var _achbar = new AWTSMOOS.Neevrah()
+    _achbar.enabled = _mouseOptions;
+
+    Object.defineProperties(
+        this, {
+            width: {
+                get: () => parent.clientWidth
+            },
+            height: {
+                get: () => parent.clientHeight
+            },
+            achbar: {
+                get: ()=>_achbar
+            },
+            difooseem: {
+                get: () => _frames
+            }
+        }
+    );
+
+    setupShmeeyuh();
+
+    function setupShmeeyuh/*listen(ors)*/(){
+        addEventListener("keydown", e=> {
+            zeh.keys[
+                e.key
+            ] = true;
+            
+        })
+    
+        addEventListener("keyup", e=>{
+            zeh.keys[
+                e.key
+            ] = false;
+            if(
+                this.printKeys
+            ) {
+                console.log(e.key)
+            }
+        });
+
+        if(_mouseOptions) {
+            achbarShmeeyuh()
+        }
+
+
+    }
+
+    function achbarShmeeyuh() {/*mouse listener(s)*/
+        addEventListener("mousemove", e=> {
+            _achbar.x = e.offsetX;
+            _achbar.y = e.offsetY
+        })
+        
+        addEventListener("mousedown", e=> {
+            _achbar.clicked = true;
+        })
+        
+        addEventListener("mouseup", e=> {
+            _achbar.clicked = false;
+        })
+    }
+
 }
 
 (() => {
@@ -133,11 +193,37 @@ function Oyluhm(opts={}) {
             opts.rotate || 
             opts.angle  || 0;
         
+        
+        Object.defineProperties(
+            this, {
+                width: {
+                    get: () => this.roychawv
+                },
+                height: {
+                    get: () => this.oyrech
+                },
+                rotation: {
+                    get: () => this.poyneh,
+                    set: v  => this.poyneh = v
+                }
+            }
+        )
+    }
+
+    eekar.Domem = function(opts={}) {
+        eekar.Neevrah.call(this, opts);
+        this.origin = {/*localOrigin*/
+            x: 0,
+            y: 0
+        };
+        
+        this.layer = opts.layer || 0;
         this.gawvawn = opts.gawvawn ||
             opts.color || 
             eekar.defaultColor
         
         this.choymer = opts.choymer ||
+            opts.chomer ||
             opts.shape ||
             eekar.defaultShape
 
@@ -147,16 +233,47 @@ function Oyluhm(opts={}) {
         
         this.heesHawvoos = opts.heesHawvoos ||
             opts.update || null;
+
+        var optsO = opts.origin || this.origin;
+        if(typeof(optsO) == "function") {
+            optsO = optsO(this)
+        }
+        
+        if(optsO.x) {
+            this.origin.x = 
+            optsO.x
+        }
+
+        if(optsO.y) {
+            this.origin.y = 
+            optsO.y
+        }
     }
 
+
     
-    var _isTurning = false;
-    var _centerPoint = {
-        x:0,y:0
-    }
-    var _half = {
-        width: 0,
-        height: 0
+
+    eekar.Gawshmeeyoos = {
+        getBoundingBox(rect) {
+            var {
+                x, y, width, height, rotation
+            } = rect;
+        },
+        neekreh/*random*/(min, max) {
+            return (
+                Math.random() * (
+                    max - min
+                ) + min
+            )
+        },
+        hittest(rect1,rect2) {
+            return (
+                rect1.x < rect2.x+rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y <rect2.y+rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            )
+        }
     }
 
     eekar.SeyderHabreeuh/*
@@ -164,83 +281,104 @@ function Oyluhm(opts={}) {
         (shapes)
     */= {
         "reebooyah": (nivra, olam) => {
-            olam.ctx.fillStyle = nivra.gawvawn;
-            if(
-                nivra.poyneh
-            ) {
-                /*olam.ctx
-                .setTransform(
-                    1,0,0,
-                    1,0,0
-                )*/
-
-
-                _isTurning = true;
-                _half.width = nivra.roychawv/2
-                _half.height = nivra.oyrech/2
-
-                _centerPoint.x = 
+            olam.ctx.fillRect(
+                nivra.origin.x,
+                nivra.origin.y,
+                nivra.roychawv ,
+                nivra.oyrech 
+            )
+        },
+        "eegool"/*circle*/:(nivra, olam) => {
+            olam.ctx.beginPath()
+            olam.ctx.arc(
+                nivra.origin.x+
+                nivra.width/2,
+                nivra.origin.y+
+                nivra.height/2,
                 (
-                    nivra.x + _half.width
-                );
-
-                _centerPoint.y = (
-                    nivra.y + _half.height
-                ) 
-                
-                olam.ctx.save()
-                olam.ctx.translate(
-                    nivra.x,
-                    _centerPoint.y
-                )
-                
-                olam.ctx.rotate(
-                    nivra.poyneh * (
-                        Math.PI / 180
-                    )
-                );
-                
-                olam.ctx.fillRect(
-                    0,
-                    -_half.height,
-                    nivra.roychawv ,
-                    nivra.oyrech 
-                )
-
-                olam.ctx.restore()
-                
-            } else {
-                olam.ctx.fillRect(
-                    nivra.x,
-                    nivra.y,
-                    nivra.roychawv,
-                    nivra.oyrech
-                )
-            }
-            
+                    nivra.width / 2 + 
+                    nivra.height /2 
+                ) / 2/*average between
+                    width and height, radius*/,
+                0/*start*/,
+                2*Math.PI/*all angels for circle*/,
+                false
+            );
+            olam.ctx.fill()
         }
     };
 
     var _curBreeyuh = null;
-    eekar.HeesHawvehNeevrah2d  = (nivra, olam) => {
-        if(
-            typeof(
-                nivra.heesHawvoos
-            ) == "function"
-        ) {
-            nivra.heesHawvoos(
-                nivra, olam
-            )
-        }
-        _curBreeyuh = eekar.SeyderHabreeuh[nivra.choymer];
-        if(
-            typeof(_curBreeyuh) 
-            != "function"
-        ) return;
+   
+    eekar.HeesHawvehNeevrah2d  = (olam) => {
+        olam.ctx.clearRect(
+            0,0,
+            olam.ctx.canvas.width,
+            olam.ctx.canvas.height
+        );
         
-        _curBreeyuh(nivra, olam);
+        olam.ctx
+            .canvas
+            .width =
+        olam.ctx
+            .canvas
+            .width;
 
+        olam.ctx.fillStyle = "black"
+        
 
+        olam.ctx
+        .setTransform(
+            1,0,0,
+            1,0,0
+        )
+        
+        
+            
+        olam.layers.forEach(layer => {
+            layer.forEach(nivra => {
+                if(
+                    typeof(
+                        nivra.heesHawvoos
+                    ) == "function"
+                ) {
+                    nivra.heesHawvoos(
+                        nivra, olam
+                    )
+                }
+                olam.ctx.fillStyle = nivra.gawvawn;
+                olam.ctx.setTransform(
+                    1/*scaleX*/,
+                    0,/*rotateX, do manually later*/
+                    0,/*rotateY...*/
+                    1,/*scaleY*/
+                    nivra.x,/*translateX amount*/
+                    nivra.y,
+                )
+                
+                if(
+                    nivra.poyneh
+                ) {
+                    olam.ctx.rotate(
+                        nivra.poyneh * (
+                            Math.PI / 180
+                        )
+                    );
+                }
+        
+                _curBreeyuh = eekar.SeyderHabreeuh[nivra.choymer];
+                if(
+                    typeof(_curBreeyuh) 
+                    != "function"
+                ) return;
+                
+                _curBreeyuh(nivra, olam);
+        
+                
+            })
+            
+        })
+        
     }
 
 })()
