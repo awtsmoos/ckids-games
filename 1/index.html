@@ -2,9 +2,47 @@ B"H
 <br>
 <script src="../awtsmoosGames.js"></script>
 <script>
+ 
+
+
+    var questions = [];
     var ol = new Oyluhm({
         printKeys: true,
-        achbar:1
+        achbar:1,
+        shtareem: [
+            "questionReader.js"
+        ],
+        html: {
+            innerHTML: "Welcome. Hit the cloud with the correct questions",
+            toldos: s=>[
+                {
+                    className: "questionContainer",
+                    toldos: {
+                        innerHTML:
+                        questions[0].question
+                    }
+                },
+                `<style>
+                    .questionContainer{
+                        position:absolute;
+                        bottom:15;
+                        padding:15px;
+                        border:1px solid black;
+                        background:yellow
+                    }
+                </style>`
+            ]
+        },
+        async kawdmon() {
+            console.log(3)
+            var shayeeluhGetter = new AWTSMOOS.Shayeeluhs();
+            questions = await shayeeluhGetter.readFromPath()
+            console.log("got questions", questions)
+        },
+        errors(er) {
+            if(!er.length) return;
+            console.log("Problems (that need fixing): ", er)
+        }
     });
 
     
@@ -25,6 +63,7 @@ B"H
             y: -me.height/2
         }),
         heesCheel(me, olam) {
+            
             me.xSpeed = 0;
             me.ySpeed = 0;
 
@@ -73,6 +112,7 @@ B"H
                     "ArrowRight"
                 ]
             ) {
+                
                 me.poyneh += me.soyvevSpeed
                 
             }
@@ -105,7 +145,7 @@ B"H
                     me.sovevLiHawsayv -
                     me.soyvevSpeed
                 ) {
-                    console.log(3)
+                    
                     me.poyneh += me.soyvevSpeed
                 }
 
@@ -115,7 +155,7 @@ B"H
                     me.soyvevSpeed
                 ) {
                     me.poyneh -= me.soyvevSpeed
-                    console.log(54)
+                    
                 } else {
                     me.poyneh = me.sovevLiHawsayv
                 }
@@ -145,7 +185,7 @@ B"H
             ) {
                 me.y = olam.height - me.height
             }
-           // console.log(me.y)
+            
             me.ySpeed = Math.sin(
                 me.poyneh * (
                     Math.PI / 180
@@ -174,7 +214,12 @@ B"H
                         ol.neevrayim[me.echad]
                     )
                 ) {
-                    me.gawvawn = "yellow"
+                    
+                    me.gawvawn = ol
+                    .neevrayim[me.echad]
+                    .dayuh
+                    .answerOption
+                    .isRight ? "green" : "red"
                 }
             }
             
@@ -182,10 +227,12 @@ B"H
                 Date.now() -
                 me.lastTime > 3400
             ) {
-                console.log(3);
+                
                 me.lastTime = Date.now()
                 awsayAwnawn()
             }
+
+            
             
         }
     })
@@ -204,7 +251,20 @@ B"H
             x: ol.width + cloudRadius,
             width:cloudRadius*2,
             height:cloudRadius*2,
-
+            dayuh: {
+                answerOption: questions[0].answerOptions[
+                    Math.floor(
+                        Math.random() * (questions[0].answerOptions.length)
+                    )
+                ]
+            }
+            ,
+            html: me => ({
+                start(){
+                    console.log(me)
+                },
+                innerHTML: me.dayuh.answerOption.text
+            }),
             color:"gray",
             heesHawvoos(me, olam) {
                 me.x -= cloudSpeed;
@@ -213,7 +273,7 @@ B"H
                 }
             }
         })
-        console.log(awnawn.x,awnawn.y)
+        
         ol.BoyrayNeevrah(awnawn)
         return awnawn;
     }
