@@ -41,8 +41,10 @@ B"H
         },
         async kawdmon() {
             console.log(3)
+
             var shayeeluhGetter = new AWTSMOOS.Shayeeluhs();
-            questions = await shayeeluhGetter.readFromPath()
+            questions = await shayeeluhGetter.readFromPath();
+
             console.log("got questions", questions)
         },
         errors(er) {
@@ -243,6 +245,10 @@ B"H
         }
     })
 
+    var curQuestion = Math.floor(
+        Math.random() * questions.length
+    )
+    
     function awsayAwnawn() {
         var cloudRadius = 200;
         var cloudSpeed = 5;
@@ -258,9 +264,13 @@ B"H
             width:cloudRadius*2,
             height:cloudRadius*2,
             dayuh: {
-                answerOption: questions[0].answerOptions[
+                answerOption: questions[curQuestion].answerOptions[
                     Math.floor(
-                        Math.random() * (questions[0].answerOptions.length)
+                        Math.random() * 
+                        (
+                            questions[curQuestion]
+                            .answerOptions.length
+                        )
                     )
                 ]
             }
