@@ -1,8 +1,10 @@
 //B"H
 if(!window.AWTSMOOS) function AWTSMOOS(){}
 Object.defineProperties(AWTSMOOS, {
+    
     Shayeeluhs: {
         get: () => function() {
+            
             this.readFromPath = () => new Promise((r,j) => {
         
                 var params = 
@@ -20,7 +22,7 @@ Object.defineProperties(AWTSMOOS, {
                     params.derech;
 
                 if(typeof(url) != "string") {
-                    j("No URL");
+                    r(null);
                     return;
                 }
             

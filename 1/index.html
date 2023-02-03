@@ -6,23 +6,30 @@ B"H
 
 
     var questions = [];
+    var sprites = {};
+
     var ol = new Oyluhm({
         printKeys: true,
         achbar:1,
-        shtareem: [
-            "questionReader.js"
-        ],
+        
         html: {
             innerHTML: "Welcome. Hit the cloud with the correct questions",
+            start(){
+                console.log("agian?")
+            },
             toldos: s=>[
                 {
                     className: "questionContainer",
                     toldos: {
                         innerHTML:
-                        questions[0].question
+                        questions?questions[0].question
+                        :"We want Moshiach now"
                     }
                 },
                 /*html*/`<style>
+                    body,html{
+                        user-select:none
+                    }
                     .questionContainer{
                         position:absolute;
                         bottom:15;
@@ -36,16 +43,38 @@ B"H
                         transform:translate(-50%,0);
                         border:1px solid black;
                     }
+
+                    .awnawnText > div {
+                        position:relative;
+                        top:50%;
+                        transform: translateY(-50%)
+                    }
+                    .awnawnText {
+                        text-align:center;
+                        font-size:5vw;
+                        text-shadow:0px 0px 0px black;
+                    }
                 </style>`
             ]
         },
-        async kawdmon() {
+        chawfawtseem/*assets*/: {
+            player: "./assets/player.html"
+        },
+        shtareem: [
+            "questionReader.js"
+        ],
+        async kawdmon(olam) {
             console.log(3)
 
             var shayeeluhGetter = new AWTSMOOS.Shayeeluhs();
+            
             questions = await shayeeluhGetter.readFromPath();
+            if(questions) {
+                console.log("got questions", questions)
+            }
 
-            console.log("got questions", questions)
+            olam.sprite("player")
+            
         },
         errors(er) {
             if(!er.length) return;
@@ -61,14 +90,16 @@ B"H
 
     boyray();
     var tseepoor = new AWTSMOOS.Domem({
-        x:17,
+        sprite:"player",
+        x:150,
         y:100,
         width:126,
         height:63,
         layer:0,
+        tseeooyr: "player",
         origin: me=>({
             
-            y: -me.height/2
+            x: me.width/2
         }),
         heesCheel(me, olam) {
             
@@ -88,7 +119,11 @@ B"H
             me.echad = 0;
             me.lastTime = Date.now();
 
+            me.awnawneem = 770
             awsayAwnawn()
+            me.meeneem = [
+                "awnawn"
+            ]
         },
 
         heesHawvoos(me, olam) {
@@ -210,8 +245,9 @@ B"H
                 me.echad++
             ) {
                 if(
-                    ol.neevrayim[me.echad].meen ==
-                    me.meen
+                    ol.neevrayim[me.echad].dayuh.meen ==
+                    me.meen || 
+                    !me.meeneem.includes(ol.neevrayim[me.echad].dayuh.meen)
                 ) {
                     
                     continue;
@@ -222,18 +258,15 @@ B"H
                         ol.neevrayim[me.echad]
                     )
                 ) {
+                    me.gawvawn="yellow"
                     
-                    me.gawvawn = ol
-                    .neevrayim[me.echad]
-                    .dayuh
-                    .answerOption
-                    .isRight ? "green" : "red"
+                    
                 }
             }
             
             if(
                 Date.now() -
-                me.lastTime > 3400
+                me.lastTime > me.awnawneem
             ) {
                 
                 me.lastTime = Date.now()
@@ -248,44 +281,91 @@ B"H
     var curQuestion = Math.floor(
         Math.random() * questions.length
     )
-    
+
     function awsayAwnawn() {
-        var cloudRadius = 200;
+        var cloudRadius = 76;
         var cloudSpeed = 5;
+        
         var awnawn = new AWTSMOOS.Domem({
             choymer: "eegool",
             layer:1,
             y: AWTSMOOS.Gawshmeeyoos.neekreh(
                 cloudRadius * 2,
                 ol.height -
-                cloudRadius
+                cloudRadius * 2
             ),
             x: ol.width + cloudRadius,
             width:cloudRadius*2,
             height:cloudRadius*2,
-            dayuh: {
-                answerOption: questions[curQuestion].answerOptions[
-                    Math.floor(
-                        Math.random() * 
-                        (
-                            questions[curQuestion]
-                            .answerOptions.length
+            
+            dayuh: me => ({
+                meen: "awnawn",
+                reeb: new AWTSMOOS.Domem({
+                    width:me.width,
+                    height:me.height,
+                    gawvawn: "blue",
+                    
+                }),
+                check(player){
+                    if(!me.answerOption)
+                        return;
+                    
+                    if(me.answerOption.isRight) {
+
+                    }
+                },
+                answerOption: questions?
+                    questions[curQuestion].answerOptions[
+                        Math.floor(
+                            Math.random() * 
+                            (
+                                questions[curQuestion]
+                                .answerOptions.length
+                            )
                         )
-                    )
-                ]
-            }
+                    ]
+                :{isRight:true}
+            })
             ,
+            alpha:0.3,
             html: me => ({
                 start(){
-                    console.log(me)
+                   // console.log(me)
                 },
-                innerHTML: me.dayuh.answerOption.text
+                className:"awnawnText",
+                tolda: {
+                    innerHTML: me.dayuh.answerOption.text
+                    ||""
+                }
+                
+                
             }),
             color:"gray",
+            
+            heesCheel(me,olam) {
+                console.log(555,)
+               // olam.BoyrayNeevrah(me.dayuh.reeb)
+                me.gotTime = 1000/*
+                    amount of time "gotten"
+                    animation should play for
+                */
+                me.curTime = 0;
+            },
             heesHawvoos(me, olam) {
+                me.dayuh.reeb.x=me.x;
+                me.dayuh.reeb.y=me.y;
                 me.x -= cloudSpeed;
                 if(me.x < -me.width) {
                     ol.Sealayk(me)
+                }
+
+                if(me.beingGot) {
+                    if(
+                        ++me.curTime < 
+                        me.gotTime
+                    ) {
+                        
+                    }
                 }
             }
         })
