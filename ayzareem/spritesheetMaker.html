@@ -1,0 +1,204 @@
+<h3>B"H</h3>
+<br>
+<input type="file" multiple id="chooser">
+<div id="res">
+    <div id="tnaweem">
+        <button id="playm">Play</button>
+        <button id="sv" disabled="true">Save</button>
+        <button id="ac">Add Rect Collider</button>
+    </div><br>
+    <div id="active">
+        
+        <canvas id="can"></canvas>
+    </div>
+    <br>
+    <canvas id="svCanvas"></canvas>
+    <div id="imgHolder">
+    </div>
+</div>
+<style>
+    #active {
+        position:relative;
+    }
+
+    .neefgash{
+        position:absolute;
+    }
+</style>
+<script src="../awtsmoosGames.js"></script>
+<script>
+    //tnaweem=options
+
+    var loadedImages = [];
+    var hawvtawchos =[]
+    var imgs;
+
+    var cols = 7;
+    var rowImgs = []
+    
+    chooser.onchange = e=>{
+        imgs = Array.from(chooser.files)
+        
+        imgs.forEach(q=>{
+            ((q) => {
+                hawvtawchos.push(function(){
+                    var url = URL.createObjectURL(q)
+                    return new Promise((r,j) => {
+                        fetch(url)
+                        .then(r=>r.blob())
+                        .then(u=>{
+                            var url = URL.createObjectURL(u)
+                            var img = document.createElement("img")
+                            //console.log("HI!",q,img,url)
+                            img.onload = () => {
+                                loadedImages.push(img)
+                                r(img)
+                            }
+                            img.src=url
+                        })
+                        
+                        
+                    })
+                })
+            })(q)
+            
+        });
+
+        Promise.all(hawvtawchos.map(q=>q()))
+        .then(r=>{
+            var curRow = 0;
+            loadedImages.forEach((q,i)=>{
+                if(!rowImgs[curRow]) {
+                    rowImgs[curRow] = []
+                }
+
+                rowImgs[curRow].push(q);
+
+                curRow++;
+                
+            })
+            can.width = loadedImages[0].width;
+            can.height = loadedImages[0].height;
+
+            sv.disabled = false;
+            playm.disabled = false;
+
+            drawEntireSheet(rowImgs, svCanvas);
+        })
+    }
+    
+    var a = document.createElement("a");
+    var c2 = can.getContext("2d");
+    var _isPlaying = true;
+    var curFr = 0
+    var neefgash;
+    ac.onclick = () => {
+        if(neefgash) return;
+        ac.disabled=true
+        neefgash/*collider*/ = 
+            new AWTSMOOS.Neefgash()/*html based
+                moveable box*/;
+        active.appendChild(neefgash.html);
+        console.log(neefgash)
+    };
+
+    playm.onclick = () => {
+        if(!_isPlaying) {
+            _isPlaying = true;
+            playAnimation();
+            playm.innerHTML = "Pause"
+        } else {
+            _isPlaying = false;
+            playm.innerHTML = "Play again?"
+        }
+        
+    };
+    
+    function playAnimation() {
+        if(!_isPlaying) return;
+        requestAnimationFrame(playAnimation);
+
+        c2.clearRect(
+            0,0,
+            c2.canvas.width,
+            c2.canvas.height
+        );
+        c2.drawImage(
+            loadedImages[
+                curFr++ % 
+                loadedImages.length
+            ],
+            0,
+            0
+        );
+    }
+
+    sv.onclick = () => {
+        drawEntireSheet(rowImgs, svCanvas);
+
+        var url = svCanvas.toDataURL()
+        var totalWidth = 0;
+        var totalHeight = 0;
+        rowImgs[0].forEach(w=>{
+            totalWidth += w.width
+        })
+
+        rowImgs.forEach(r=>{
+            totalHeight += r[0].height
+        })
+        
+        var data = {
+            tseeyoor: url,
+            rows:rowImgs.length,
+            columns:rowImgs[0].length,
+            eachWidth:loadedImages[0].width,
+            eachHeight:loadedImages[0].height,
+            totalWidth,
+            totalHeight,
+            collisionMask: neefgash.html.getBoundingClientRect()
+        };
+
+        a.href = URL.createObjectURL(
+            AWTSMOOS
+            .Ayzareem
+            .encodeCheftsa(JSON.stringify(data))
+        );
+
+        a.download = "BH_"+Date.now()+".html"
+        a.click();
+
+    }
+
+    function drawEntireSheet(rowImgs, canvas) {
+        var totalWidth = 0;
+        var totalHeight = 0;
+
+        
+        
+        
+        totalHeight = rowImgs.length * rowImgs[0][0].height;
+        totalWidth = rowImgs[0].length * rowImgs[0][0].width;
+
+        canvas.width = totalWidth;
+        canvas.height= totalHeight;
+
+        var c = canvas.getContext("2d")
+        c.clearRect(
+            0,0,
+            c.canvas.width,
+            c.canvas.height
+        );
+
+        rowImgs.forEach((q,y)=>{
+            q.forEach((k,x)=> {
+                console.log(x,y)
+                c.drawImage(
+                    k,
+                    x * k.width,
+                    y * k.height,
+                    
+                )
+            })
+        })
+    }
+</script>

@@ -28,7 +28,11 @@ function Oyluhm(opts={}) {
     var parent = opts.parent || document.body;
     parent.classList.add("awtsParent"+id);
     parent.appendChild(canvas)
-
+    
+    var peulawAwv = document.createElement("div");
+    peulawAwv.className="peulawAwv"//event "holder"
+    
+    parent.appendChild(peulawAwv)
     canvas.className="awtsCanvas"+id
     addEventListener("resize", resize)
     function resize() {
@@ -42,7 +46,7 @@ function Oyluhm(opts={}) {
     var style = document.createElement("style")
     parent.appendChild(style)
     
-    style.innerHTML = `
+    style.innerHTML = /*css*/`
         html,body {
             overflow:hidden
         }
@@ -58,7 +62,15 @@ function Oyluhm(opts={}) {
             width:100%;
             height:100%;
         }
+
+        .peulawAwv {
+            position:fixed;
+            left:0;top:0;
+            width:100%;height:100%;
+            z-index:18927;
+        }
     `
+
     var zeh = this;
 
     zeh.ctx = ctx;
@@ -98,15 +110,22 @@ function Oyluhm(opts={}) {
             if(typeof(
                 nivra.heesCheel
             ) == "function") {
-                _readyQueue.push(
-                    function() {
-                        ((nivra,zeh)=>{
-                            nivra.heesCheel(
-                            nivra, zeh
-                            )
-                        })(nivra,zeh);
-                    }
-                );
+                var start = function() {
+                    ((nivra,zeh)=>{
+                        nivra.heesCheel(
+                        nivra, zeh
+                        )
+                    })(nivra,zeh);
+                }
+
+                
+                if(_isReady) {
+                    start()
+                } else {
+                    _readyQueue.push(
+                        start
+                    );
+                }
             }
             resize();
         }
@@ -126,6 +145,52 @@ function Oyluhm(opts={}) {
     var _achbar = new AWTSMOOS.Neevrah()
     _achbar.enabled = _mouseOptions;
 
+    var _loadedCheftawtseem = {};
+    var _sprites = {};
+
+    this.sprite = (cheftsaName) => 
+    new Promise((r,j) => {
+        if(
+            typeof(cheftsaName) != "string" ||
+            !_loadedCheftawtseem[cheftsaName]
+        ) {
+            return j({
+                message: "no asset with the name "+cheftsaName,
+                code: "NO_ASSET",
+                asset: cheftsaName
+            })
+        }
+
+        var im = document.createElement("img");
+        var {
+            
+            x, y, rows, columns,
+            eachHeight,
+            eachWidth,
+            totalHeight,
+            totalWidth,
+            
+            tseeyoor
+        } = _loadedCheftawtseem[cheftsaName];
+        
+        _sprites[cheftsaName] = {
+            
+            x, y, rows, columns,
+            eachHeight,
+            eachWidth,
+            totalHeight,
+            totalWidth,
+            image: im
+        };
+
+        im.onload = () => {
+            r(_sprites[cheftsaName])
+        }
+
+        im.onerror = j;
+        im.src = tseeyoor;
+
+    });
     Object.defineProperties(
         this, {
             width: {
@@ -142,14 +207,23 @@ function Oyluhm(opts={}) {
             },
             isReady: {
                 get: () => _isReady
+            },
+            chefawtseem: {
+                get: () => _loadedCheftawtseem
+            },
+            chawfawtseem: {
+                get: () => zeh.chawfawtseem
+            },
+            sprites: {
+                get: () => _sprites
             }
         }
     );
 
     var shtareem = opts.shtareem || opts.scripts;
-    
+    var chawfawtseem = opts.chawfawtseem || opts.assets;
     if(!shtareem || !shtareem.length) {
-        ready();
+        beforeAssetsLoad();
     }
     else {
         
@@ -163,9 +237,58 @@ function Oyluhm(opts={}) {
         
         Promise.all(promises)
         .then(q=>{
+
+            beforeAssetsLoad()
+        }).catch(e=>{
+            console.log("er",e)
             ready()
-        }).catch(e=>ready())
+        })
         
+    }
+
+    function beforeAssetsLoad() {
+        var bfl = opts.beforeAssetsLoad || opts.bal;
+        if(typeof(bfl) == "function") {
+            bfl(zeh);
+        }
+
+        if(
+            !chawfawtseem 
+                || typeof(chawfawtseem)
+                != "object"
+        ) {
+            console.log("reall2y?",chawfawtseem)
+            ready()
+        } else {
+            console.log("really?")
+            var hawvtawchos = [];
+            Object.keys(chawfawtseem).forEach(key=>{
+                hawvtawchos.push(new Promise((r,j) => {
+                    var val;
+                    window.awtsmoosShaweeluh = d => {
+                        val = d;
+                        r([key,val])
+                    };
+                    var chef = chawfawtseem[key]
+                    var path = typeof(chef) == "string"?chef:null;
+                    if(!path) r(null);
+                    AWTSMOOS.Ayzareem.hawveeShtar(path)
+                    .then(()=>{}).catch(j)
+                }))
+            })
+
+            Promise.all(hawvtawchos)
+            .then(r=>{
+                console.log("HI!",a=r)
+                r.forEach(q=>{
+                    _loadedCheftawtseem[q[0]] = q[1]
+                })
+                ready()
+            }).catch(e=>{
+                console.log("er,",e)
+                ready()
+            })
+        }
     }
     function ready() {
         var errorFnc = opts.errors ||
@@ -187,7 +310,7 @@ function Oyluhm(opts={}) {
             )
         ) {
             
-            br().then((r) => {
+            br(zeh).then((r) => {
                 
                 done()
             })
@@ -245,14 +368,14 @@ function Oyluhm(opts={}) {
     
 
     function setupShmeeyuh/*listen(ors)*/(){
-        addEventListener("keydown", e=> {
+        peulawAwv.addEventListener("keydown", e=> {
             zeh.keys[
                 e.key
             ] = true;
             
         })
     
-        addEventListener("keyup", e=>{
+        peulawAwv.addEventListener("keyup", e=>{
             zeh.keys[
                 e.key
             ] = false;
@@ -273,16 +396,16 @@ function Oyluhm(opts={}) {
 
 
     function achbarShmeeyuh() {/*mouse listener(s)*/
-        addEventListener("mousemove", e=> {
+        parent.addEventListener("mousemove", e=> {
             _achbar.x = e.offsetX;
             _achbar.y = e.offsetY
         })
         
-        addEventListener("mousedown", e=> {
+        parent.addEventListener("mousedown", e=> {
             _achbar.clicked = true;
         })
         
-        addEventListener("mouseup", e=> {
+        parent.addEventListener("mouseup", e=> {
             _achbar.clicked = false;
         })
     }
@@ -300,7 +423,369 @@ function Oyluhm(opts={}) {
 
     var _curBreeyuh = null;
 
+    var _secretCanvas = document.createElement("canvas");
+        //used for helper canvas operatiosn
+    var _ctx = _secretCanvas.getContext("2d");
+
+
+    
     Object.defineProperties(eekar, {
+        Neefgash: {
+            get:  () => function() {
+                var html = document.createElement("div");
+                html.style.position = "absolute";
+                html.style.top = "50px";
+                html.style.left = "50px";
+                html.style.width = "100px";
+                html.style.height = "100px";
+                html.style.backgroundColor = "lightblue";
+
+                
+                var leftEdge = document.createElement("div");
+                leftEdge.style.position = "absolute";
+                leftEdge.style.top = "0";
+                leftEdge.style.left = "-5px";
+                leftEdge.style.bottom = "0";
+                leftEdge.style.width = "10px";
+                leftEdge.style.cursor = "ew-resize";
+                leftEdge.style.backgroundColor = "transparent";
+                html.appendChild(leftEdge);
+
+                                
+                var rightEdge = document.createElement("div");
+                rightEdge.style.position = "absolute";
+                rightEdge.style.top = "0";
+                rightEdge.style.right = "-5px";
+                rightEdge.style.bottom = "0";
+                rightEdge.style.width = "10px";
+                rightEdge.style.cursor = "ew-resize";
+                rightEdge.style.backgroundColor = "transparent";
+                html.appendChild(rightEdge);
+
+                
+                var topEdge = document.createElement("div");
+                topEdge.style.position = "absolute";
+                topEdge.style.top = "-5px";
+                topEdge.style.left = "0";
+                topEdge.style.right = "0";
+                topEdge.style.height = "10px";
+                topEdge.style.cursor = "ns-resize";
+                topEdge.style.backgroundColor = "transparent";
+                html.appendChild(topEdge);
+
+                
+                var bottomEdge = document.createElement("div");
+                bottomEdge.style.position = "absolute";
+                bottomEdge.style.bottom = "-5px";
+                bottomEdge.style.left = "0";
+                bottomEdge.style.right = "0";
+                bottomEdge.style.height = "10px";
+                bottomEdge.style.cursor = "ns-resize";
+                bottomEdge.style.backgroundColor = "transparent";
+                html.appendChild(bottomEdge);
+
+                
+                
+                bottomEdge.addEventListener("mousedown", function(e) {
+                    const startingHeight = parseInt(window.getComputedStyle(html).height, 10);
+                    const startingY = e.clientY;
+                
+                    function handleResize(e) {
+                        html.style.height = startingHeight + e.clientY - startingY + "px";
+                    }
+                    document.addEventListener("mousemove", handleResize);
+                    document.addEventListener("mouseup", function() {
+                        document.removeEventListener("mousemove", handleResize);
+                    });
+                });
+
+
+                var topLeftCorner = document.createElement("div");
+
+                topLeftCorner.style.position = "absolute";
+                topLeftCorner.style.top = "-5px";
+                topLeftCorner.style.left = "-5px";
+                topLeftCorner.style.width = "10px";
+                topLeftCorner.style.height = "10px";
+                topLeftCorner.style.cursor = "nwse-resize";
+                topLeftCorner.style.backgroundColor = "transparent";
+                html.appendChild(topLeftCorner);
+
+                var topRightCorner = document.createElement("div");
+                topRightCorner.style.position = "absolute";
+                topRightCorner.style.top = "-5px";
+                topRightCorner.style.right = "-5px";
+                topRightCorner.style.width = "10px";
+                topRightCorner.style.height = "10px";
+                topRightCorner.style.cursor = "nesw-resize";
+                topRightCorner.style.backgroundColor = "transparent";
+                html.appendChild(topRightCorner);
+
+                var bottomLeftCorner = document.createElement("div");
+                bottomLeftCorner.style.position = "absolute";
+                bottomLeftCorner.style.bottom = "-5px";
+                bottomLeftCorner.style.left = "-5px";
+                bottomLeftCorner.style.width = "10px";
+                bottomLeftCorner.style.height = "10px";
+                bottomLeftCorner.style.cursor = "nesw-resize";
+                bottomLeftCorner.style.backgroundColor = "transparent";
+                html.appendChild(bottomLeftCorner);
+
+                var bottomRightCorner = document.createElement("div");
+                bottomRightCorner.style.position = "absolute";
+                bottomRightCorner.style.bottom = "-5px";
+                bottomRightCorner.style.right = "-5px";
+                bottomRightCorner.style.width = "10px";
+                bottomRightCorner.style.height = "10px";
+                bottomRightCorner.style.cursor = "nwse-resize";
+                bottomRightCorner.style.backgroundColor = "transparent";
+                html.appendChild(bottomRightCorner);
+
+
+
+                //Create event listeners for the edges and corners to handle resizing
+
+                //Top edge
+                topEdge.addEventListener("mousedown", function(event) {
+                    startY = event.clientY;
+                    startHeight = parseInt(window.getComputedStyle(html).getPropertyValue("height"), 10);
+                    document.addEventListener("mousemove", mouseMoveTopEdge);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveTopEdge(event) {
+                    const newHeight = startHeight + (startY - event.clientY);
+                    html.style.height = newHeight + "px";
+                }
+
+                //Right edge
+                rightEdge.addEventListener("mousedown", function(event) {
+                    startX = event.clientX;
+                    startWidth = parseInt(window.getComputedStyle(html).getPropertyValue("width"), 10);
+                    document.addEventListener("mousemove", mouseMoveRightEdge);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveRightEdge(event) {
+                    const newWidth = startWidth + (event.clientX - startX);
+                    html.style.width = newWidth + "px";
+                }
+
+                //Bottom edge
+                bottomEdge.addEventListener("mousedown", function(event) {
+                    startY = event.clientY;
+                    startHeight = parseInt(window.getComputedStyle(html).getPropertyValue("height"), 10);
+                    document.addEventListener("mousemove", mouseMoveBottomEdge);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveBottomEdge(event) {
+                    const newHeight = startHeight + (event.clientY - startY);
+                    html.style.height = newHeight + "px";
+                }
+
+                //Left edge
+                leftEdge.addEventListener("mousedown", function(event) {
+                    startX = event.clientX;
+                    startWidth = parseInt(window.getComputedStyle(html).getPropertyValue("width"), 10);
+                    document.addEventListener("mousemove", mouseMoveLeftEdge);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveLeftEdge(event) {
+                    const newWidth = startWidth + (startX - event.clientX);
+                    html.style.width = newWidth + "px";
+                }
+
+                //Top-left corner
+                topLeftCorner.addEventListener("mousedown", function(event) {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(window.getComputedStyle(html).getPropertyValue("width"), 10);
+                    startHeight = parseInt(window.getComputedStyle(html).getPropertyValue("height"), 10);
+                    document.addEventListener("mousemove", mouseMoveTopLeftCorner);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveTopLeftCorner(event) {
+                    const newWidth = startWidth + (startX - event.clientX);
+                    html.style.width = newWidth + "px";
+                    const newHeight = startHeight + (startY - event.clientY);
+                    html.style.height = newHeight + "px";
+                    html.style.left = startLeft - (startX - event.clientX) + "px";
+                    html.style.top = startTop - (startY - event.clientY) + "px";
+                }
+                
+                topLeftCorner.addEventListener("mousedown", (event) => {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(html.style.width.slice(0, -2));
+                    startHeight = parseInt(html.style.height.slice(0, -2));
+                    startLeft = parseInt(html.style.left.slice(0, -2));
+                    startTop = parseInt(html.style.top.slice(0, -2));
+                    window.addEventListener("mousemove", mouseMoveTopLeftCorner);
+                });
+                
+                window.addEventListener("mouseup", () => {
+                    window.removeEventListener("mousemove", mouseMoveTopLeftCorner);
+                });
+
+                function mouseMoveTopRightCorner(event) {
+                    const newWidth = startWidth + (event.clientX - startX);
+                    html.style.width = newWidth + "px";
+                    const newHeight = startHeight + (startY - event.clientY);
+                    html.style.height = newHeight + "px";
+                    html.style.top = startTop - (startY - event.clientY) + "px";
+                }
+                
+                topRightCorner.addEventListener("mousedown", (event) => {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(html.style.width.slice(0, -2));
+                    startHeight = parseInt(html.style.height.slice(0, -2));
+                    startTop = parseInt(html.style.top.slice(0, -2));
+                    window.addEventListener("mousemove", mouseMoveTopRightCorner);
+                });
+                
+                window.addEventListener("mouseup", () => {
+                    window.removeEventListener("mousemove", mouseMoveTopRightCorner);
+                });
+
+                function mouseUp() {
+                    document.removeEventListener("mousemove", mouseMoveTopEdge);
+                    document.removeEventListener("mousemove", mouseMoveRightEdge);
+                    document.removeEventListener("mousemove", mouseMoveBottomEdge);
+                    document.removeEventListener("mousemove", mouseMoveLeftEdge);
+                    document.removeEventListener("mousemove", mouseMoveTopRightCorner);
+                    document.removeEventListener("mousemove", mouseMoveBottomRightCorner);
+                    document.removeEventListener("mousemove", mouseMoveBottomLeftCorner);
+                    document.removeEventListener("mousemove", mouseMoveTopLeftCorner);
+                    document.removeEventListener("mouseup", mouseUp);
+                }
+
+                topLeftCorner.addEventListener("mousedown", (event) => {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(html.style.width.slice(0, -2));
+                    startHeight = parseInt(html.style.height.slice(0, -2));
+                    startLeft = parseInt(html.style.left.slice(0, -2));
+                    startTop = parseInt(html.style.top.slice(0, -2));
+                    window.addEventListener("mousemove", mouseMoveTopLeftCorner);
+                });
+
+                window.addEventListener("mouseup", () => {
+                    window.removeEventListener("mousemove", mouseMoveTopLeftCorner);
+                });
+
+
+                // Mousemove functions for corner resizing
+                function mouseMoveBottomRightCorner(event) {
+                    const newWidth = startWidth + (event.clientX - startX);
+                    html.style.width = newWidth + "px";
+                    const newHeight = startHeight + (event.clientY - startY);
+                    html.style.height = newHeight + "px";
+                }
+
+                bottomRightCorner.addEventListener("mousedown", function(event) {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(window.getComputedStyle(html).getPropertyValue("width"), 10);
+                    startHeight = parseInt(window.getComputedStyle(html).getPropertyValue("height"), 10);
+                    document.addEventListener("mousemove", mouseMoveBottomRightCorner);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                function mouseMoveBottomLeftCorner(event) {
+                    const newWidth = startWidth + (startX - event.clientX);
+                    html.style.width = newWidth + "px";
+                    const newHeight = startHeight + (event.clientY - startY);
+                    html.style.height = newHeight + "px";
+                }
+                
+                bottomLeftCorner.addEventListener("mousedown", function(event) {
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    startWidth = parseInt(window.getComputedStyle(container).getPropertyValue("width"), 10);
+                    startHeight = parseInt(window.getComputedStyle(container).getPropertyValue("height"), 10);
+                    document.addEventListener("mousemove", mouseMoveBottomLeftCorner);
+                    document.addEventListener("mouseup", mouseUp);
+                });
+
+                var isDragging = false;
+                var currentX;
+                var currentY;
+                var initialX;
+                var initialY;
+                var xOffset = 0;
+                var yOffset = 0;
+
+                var scale = 1;
+                var rotation = 0;
+                var currentWidth;
+                var currentHeight
+                html.addEventListener("mousedown", dragStart);
+                html.addEventListener("mouseup", dragEnd);
+                html.addEventListener("mouseout", dragEnd);
+                html.addEventListener("mousemove", drag);
+
+                function dragStart(e) {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                
+                    isDragging = true;
+                }
+                
+                function dragEnd(e) {
+                    isDragging = false;
+                }
+                
+                function drag(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                
+                        xOffset = currentX;
+                        yOffset = currentY;
+                
+                        setTranslate(currentX, currentY, html);
+                    }
+                }
+
+                var _scaleTransform = ""
+                var _translateTransform = ""
+               
+
+                function setTranslate(xPos, yPos, el) {
+                    _translateTransform = "translate3d(" 
+                        + xPos + "px, " 
+                        + yPos + "px, 0)";
+                    updateTransform();
+                }
+
+                function updateTransform() {
+                    html.style.transform = _translateTransform
+                        + " " + _scaleTransform
+                }
+
+                Object.defineProperties(this, {
+                    x: {
+                        get:() => currentX
+                    },
+                    y: {
+                        get: () => currentY
+                    },
+                    width: {
+                        get: ()=>currentWidth
+                    },
+                    html: {
+                        get: ()=>html
+                    }
+                })
+
+            }
+        },
+        
         html:  {
             get: () =>(opts={},par) => {
                         
@@ -319,7 +804,13 @@ function Oyluhm(opts={}) {
                     ||"div";
                 var el = document.createElement(tag);
                 var children = opts.children ||
-                    opts.toldos;
+                    opts.toldos ||
+                    opts.tolda ||
+                    opts.child ||
+                    opts.ben || 
+                    opts.bas ||
+                    opts.yeled ||
+                    opts.yelawdeem;
                 
                 var childElements = () => el.children;
                 var getChild = nm => {
@@ -393,7 +884,31 @@ function Oyluhm(opts={}) {
         Ayzareem: {
             
             get: ()=> ({
-                
+                encodeCheftsa(dayuh/*data*/){
+                    return new Blob([
+                        "//B\"H<br><script>\n"
+                        +"if(!window.awtsmoosShaweeluh)"
+                        +"awtsmoosShaweeluh=(d)=>console.log(r=d);\n"
+                        +"awtsmoosShaweeluh("+
+                            dayuh
+                        +");\n//</scr"+"ipt>"
+                    ],{
+                        type: "text/html"
+                    })
+                },
+                colorNameToRGB(colorName) {
+                    _secretCanvas.width = 1;
+                    _secretCanvas.height= 1;
+                    _ctx.clearRect(0,0,1,1);
+                    _ctx.fillStyle = colorName;
+                    _ctx.fillRect(0,0,1,1);
+                    var data = _ctx.getImageData(0,0,1,1);
+                    return {
+                        r:data[0],
+                        g:data[1],
+                        b:data[2]
+                    }
+                },
                 isElement: () => el =>
                    el instanceof Element ||
                    el instanceof HTMLDocument ||
@@ -454,7 +969,8 @@ function Oyluhm(opts={}) {
                     x: 0,
                     y: 0
                 };
-                
+                this.alpha = opts.alpha;
+
                 this.layer = opts.layer || 0;
                 this.gawvawn = opts.gawvawn ||
                     opts.color || 
@@ -464,7 +980,7 @@ function Oyluhm(opts={}) {
                     opts.chomer ||
                     opts.shape ||
                     eekar.defaultShape
-        
+                
                 this.heesCheel = opts.heesCheel ||
                     opts.start || null;
         
@@ -472,6 +988,7 @@ function Oyluhm(opts={}) {
                 this.heesHawvoos = opts.heesHawvoos ||
                     opts.update || null;
         
+                this.sprite = opts.sprite || opts.tseeooyr
                 var optsO = opts.origin || this.origin;
                 if(typeof(optsO) == "function") {
                     optsO = optsO(this)
@@ -487,9 +1004,16 @@ function Oyluhm(opts={}) {
                     optsO.y
                 }
 
-                this.dayuh = opts.dayuh;
+                this.dayuh = opts.dayuh||{};
+                if(typeof(this.dayuh) == "function") {
+                    this.dayuh = this.dayuh(this)
+                }
                 var _html;
                 Object.defineProperties(this, {
+                    radius: {
+                        get: () => Math.max
+                            (this.width,this.height)/2
+                    },
                     html: {
                         get: () => _html,
                         set: v => {
@@ -517,6 +1041,40 @@ function Oyluhm(opts={}) {
         },
         Gawshmeeyoos: {
             get: () => ({
+                
+                isRectangleCircleColliding(circleX, circleY, circleRadius, rectX, rectY, rectWidth, rectHeight, rectRotation) {
+                    const rectCorner1X = rectX// - rectWidth / 2,
+                        rectCorner1Y = rectY// - rectHeight / 2,
+
+                        rectCorner2X = rectX + rectWidth,
+                        rectCorner2Y = rectY,
+
+                        rectCorner3X = rectX + rectWidth,
+                        rectCorner3Y = rectY + rectHeight,
+                        rectCorner4X = rectX,
+                        rectCorner4Y = rectY + rectHeight;
+                
+                    const rectCorner1RotatedX = (rectCorner1X - rectX) * Math.cos(rectRotation) - (rectCorner1Y - rectY) * Math.sin(rectRotation) + rectX,
+                        rectCorner1RotatedY = (rectCorner1X - rectX) * Math.sin(rectRotation) + (rectCorner1Y - rectY) * Math.cos(rectRotation) + rectY,
+                        
+                        rectCorner2RotatedX = (rectCorner2X - rectX) * Math.cos(rectRotation) - (rectCorner2Y - rectY) * Math.sin(rectRotation) + rectX,
+                        rectCorner2RotatedY = (rectCorner2X - rectX) * Math.sin(rectRotation) + (rectCorner2Y - rectY) * Math.cos(rectRotation) + rectY,
+                        
+                        rectCorner3RotatedX = (rectCorner3X - rectX) * Math.cos(rectRotation) - (rectCorner3Y - rectY) * Math.sin(rectRotation) + rectX,
+                        rectCorner3RotatedY = (rectCorner3X - rectX) * Math.sin(rectRotation) + (rectCorner3Y - rectY) * Math.cos(rectRotation) + rectY,
+                        
+                        rectCorner4RotatedX = (rectCorner4X - rectX) * Math.cos(rectRotation) - (rectCorner4Y - rectY) * Math.sin(rectRotation) + rectX,
+                        rectCorner4RotatedY = (rectCorner4X - rectX) * Math.sin(rectRotation) + (rectCorner4Y - rectY) * Math.cos(rectRotation) + rectY;
+                
+                    if (isPointInsideCircle(circleX, circleY, circleRadius, rectCorner1RotatedX, rectCorner1RotatedY) ||
+                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner2RotatedX, rectCorner2RotatedY) ||
+                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner3RotatedX, rectCorner3RotatedY) ||
+                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner4RotatedX, rectCorner4RotatedY)) {
+                        return true;
+                    }
+                
+                    return false;
+                },
                 getBoundingBox(rect) {
                     var {
                         x, y, width, height, rotation
@@ -529,13 +1087,52 @@ function Oyluhm(opts={}) {
                         ) + min
                     )
                 },
-                hittest(rect1,rect2) {
+                rect2rectHittest(rect1,rect2){
                     return (
                         rect1.x < rect2.x+rect2.width &&
                         rect1.x + rect1.width > rect2.x &&
                         rect1.y <rect2.y+rect2.height &&
                         rect1.y + rect1.height > rect2.y
+                    );
+                    
+                },
+                hittest(rect1,rect2) {
+                    var greater = Math.max(
+                        rect1.width, rect1.height
                     )
+                    var boxTest = AWTSMOOS.Gawshmeeyoos
+                        .rect2rectHittest({
+                            x: rect1.x - greater,
+                            y: rect1.y - greater,
+                            width: greater * 2,
+                            height: greater * 2
+                        }, rect2)
+                    if(!boxTest) return false;
+                    if(
+                        
+                        rect1.choymer == "reebooyah" &&
+                        rect2.choymer == "eegool" 
+                    ) {
+                        
+                        var rectToCircleTest = AWTSMOOS
+                            .Gawshmeeyoos
+                            .isRectangleCircleColliding(
+                                rect2/*really circle*/.x,
+                                rect2.y,
+                                rect2.radius,
+                                rect1.x,
+                                rect1.y,
+                                rect1.width,
+                                rect1.height,
+                                rect1.rotation*Math.PI/180
+                            )
+                            
+                        return rectToCircleTest;
+
+                    } else {
+                        console.log(rect1.choymer)
+                        return boxTest;
+                    }
                 }
             })
         },
@@ -546,24 +1143,18 @@ function Oyluhm(opts={}) {
             get: () => ({
                 "reebooyah": (nivra, olam) => {
                     olam.ctx.fillRect(
-                        nivra.origin.x,
-                        nivra.origin.y,
-                        nivra.roychawv ,
+                        0,0,
+
+                        nivra.roychawv,
                         nivra.oyrech 
                     )
                 },
                 "eegool"/*circle*/:(nivra, olam) => {
                     olam.ctx.beginPath()
                     olam.ctx.arc(
-                        nivra.origin.x+
-                        nivra.width/2,
-                        nivra.origin.y+
-                        nivra.height/2,
-                        (
-                            nivra.width / 2 + 
-                            nivra.height /2 
-                        ) / 2/*average between
-                            width and height, radius*/,
+                        0,
+                        0,
+                        nivra.radius,
                         0/*start*/,
                         2*Math.PI/*all angels for circle*/,
                         false
@@ -609,7 +1200,11 @@ function Oyluhm(opts={}) {
                                 nivra, olam
                             )
                         }
+                        olam.ctx.globalAlpha = 1;
                         olam.ctx.fillStyle = nivra.gawvawn;
+                        if(nivra.alpha) {
+                            olam.ctx.globalAlpha = nivra.alpha;
+                        }
                         olam.ctx.setTransform(
                             1/*scaleX*/,
                             0,/*rotateX, do manually later*/
@@ -640,10 +1235,52 @@ function Oyluhm(opts={}) {
                         
                         if(nivra.html) {
                             nivra.html.style.left = nivra.x + "px";
-                            nivra.html.style.top = nivra.y + "px"
-                            nivra.html.width = nivra.width;
-                            nivra.html.height = nivra.height;
+                            nivra.html.style.top = nivra.y + "px";
+
+                            nivra.html.width = 
+                                nivra.html.style.width = 
+                                nivra.width;
+
+                            nivra.html.height = 
+                                nivra.html.style.height =
+                                nivra.height;
                         }
+
+                        if(nivra.sprite) {
+                            if(!olam.sprites[
+                                nivra.sprite
+                            ]) {
+                                console.log(444)
+                                return;
+                            }
+
+                            if(
+                                typeof(nivra._curSpriteFrame)
+                                != "number"
+                            ) {
+                                nivra._curSpriteFrame = 0;
+                            }
+                            var {
+                                totalWidth,
+                                totalHeight,
+                                eachWidth,
+                                eachHeight,
+                                image,
+                                rows,
+                                columns
+                            } = nivra.sprite;
+                            return;
+                            olam.ctx.drawImage(
+                                image, 
+                                0,0//get back to row logic later
+                                /*(nivra._curSpriteFrame % columns)
+                                    * eachHeight,*/
+                                
+                            )
+                            nivra._curSpriteFrame++;
+
+                        }
+                        
                         
                     })
                     
@@ -654,7 +1291,144 @@ function Oyluhm(opts={}) {
     })
     
 
+function getRotatedRectanglePoints(rect) {
+  let x = rect.x;
+  let y = rect.y;
+  let w = rect.width;
+  let h = rect.height;
+  let r = rect.rotation * Math.PI/180;
 
+  let x1 = x + (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
+  let y1 = y + (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
+
+  let x2 = x + (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
+  let y2 = y - (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
+
+  let x3 = x - (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
+  let y3 = y - (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
+
+  let x4 = x - (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
+  let y4 = y + (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
+
+  return [[x1,y1], [x2,y2], [x3,y3], [x4,y4]];
+}
+
+function detectLineCircleCollision(lineStart, lineEnd, circle) {
+  let x1 = lineStart[0];
+  let y1 = lineStart[1];
+  let x2 = lineEnd[0];
+  let y2 = lineEnd[1];
+
+  let cx = circle.x;
+  let cy = circle.y;
+  let r = circle.radius;
     
-   
+  let dx = x2 - x1;
+  let dy = y2 - y1;
+  let fx = x1 - cx;
+  let fy = y1 - cy;
+
+  let a = dx * dx + dy * dy;
+  let b = 2 * (fx * dx + fy * dy);
+  let c = fx * fx + fy * fy - r * r;
+
+  console.log(
+    "Hi ChatGPT, heres lineStart",
+    lineStart,"lineEnd",
+    lineEnd,"circle info:",{
+       x:circle.x,
+       y:circle.y,
+       radius:circle.radius
+    }
+  )
+  if (a <= 0.0000001) {
+    return false;
+  }
+
+  let discriminant = b * b - 4 * a * c;
+  if (discriminant < 0) {
+    return false;
+  }
+
+  let t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+  let t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+  if (t1 >= 0 && t1 <= 1 || t2 >= 0 && t2 <= 1) {
+    return true;
+  }
+  
+  return false;
+}   
+    
+function rotatePoint(x, y, centerX, centerY, angle) {
+    let newX = Math.cos(angle) * (x - centerX) - Math.sin(angle) * (y - centerY) + centerX;
+    let newY = Math.sin(angle) * (x - centerX) + Math.cos(angle) * (y - centerY) + centerY;
+    return {
+        x: newX,
+        y: newY
+    };
+}
+function isCircleIntersectingLine(circleX, circleY, circleRadius, lineX1, lineY1, lineX2, lineY2) {
+    // Find the closest point on the line to the center of the circle
+    const dx = lineX2 - lineX1;
+    const dy = lineY2 - lineY1;
+    const t = ((circleX - lineX1) * dx + (circleY - lineY1) * dy) / (dx * dx + dy * dy);
+    let closestX = lineX1 + t * dx;
+    let closestY = lineY1 + t * dy;
+
+    // If t is less than 0, the closest point is lineX1, lineY1
+    if (t < 0) {
+        closestX = lineX1;
+        closestY = lineY1;
+    }
+
+    // If t is greater than 1, the closest point is lineX2, lineY2
+    if (t > 1) {
+        closestX = lineX2;
+        closestY = lineY2;
+    }
+
+    // Check if the distance between the center of the circle and the closest point on the line is less than the radius of the circle
+    const distance = Math.sqrt((circleX - closestX) ** 2 + (circleY - closestY) ** 2);
+    return distance < circleRadius;
+}
+
+function isPointInsideRectangle(pointX, pointY, rectX, rectY, rectWidth, rectHeight, rectRotation) {
+    // Rotate the point about the center of the rectangle
+    const rectCenterX = rectX + rectWidth / 2;
+    const rectCenterY = rectY + rectHeight / 2;
+    const rotatedX = (pointX - rectCenterX) * Math.cos(-rectRotation) - (pointY - rectCenterY) * Math.sin(-rectRotation) + rectCenterX;
+    const rotatedY = (pointX - rectCenterX) * Math.sin(-rectRotation) + (pointY - rectCenterY) * Math.cos(-rectRotation) + rectCenterY;
+
+    // Check if the point is inside the rectangle
+    return rotatedX >= rectX && rotatedX <= rectX + rectWidth && rotatedY >= rectY && rotatedY <= rectY + rectHeight;
+}
+// Helper function to check if a point is within an oval
+function isPointInOval(x, y, oval) {
+    let ovalX = oval.x + oval.width / 2;
+    let ovalY = oval.y + oval.height / 2;
+    let halfWidth = oval.width / 2;
+    let halfHeight = oval.height / 2;
+    let normalizedX = (x - ovalX) / halfWidth;
+    let normalizedY = (y - ovalY) / halfHeight;
+    return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
+}
+function getDistance(x1, y1, x2, y2) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  
+//check if a point is inside a circle
+function isPointInsideCircle(cx, cy, cradius, px, py) {
+    let distance = distanceBetweenPoints(cx, cy, px, py);
+    return distance <= cradius;
+  }
+  
+  //find the distance between two points
+  function distanceBetweenPoints(x1, y1, x2, y2) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 })()
