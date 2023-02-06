@@ -58,7 +58,7 @@ B"H
             ]
         },
         chawfawtseem/*assets*/: {
-            player: "./assets/player.html"
+          player: "./assets/player.html"
         },
         shtareem: [
             "questionReader.js"
@@ -73,7 +73,11 @@ B"H
                 console.log("got questions", questions)
             }
 
-            olam.sprite("player")
+            await olam.spritesheet("player", {
+                progress({total,current}) {
+                    console.log("There: ",current/total);
+                }
+            })
             
         },
         errors(er) {
@@ -90,19 +94,19 @@ B"H
 
     boyray();
     var tseepoor = new AWTSMOOS.Domem({
-        sprite:"player",
+        spriteSheet:"player",
         x:150,
-        y:100,
+        y:400,
         width:126,
         height:63,
         layer:0,
         tseeooyr: "player",
         origin: me=>({
-            
-            x: me.width/2
+            y: -me.height/2,
+            x: -me.width/2
         }),
         heesCheel(me, olam) {
-            
+            console.log("Yo",me.spriteSheet)
             me.xSpeed = 0;
             me.ySpeed = 0;
 
@@ -124,10 +128,14 @@ B"H
             me.meeneem = [
                 "awnawn"
             ]
+
+            me.minPoyneh = -63
+            me.maxPoyneh = 46;
+        
         },
 
         heesHawvoos(me, olam) {
-            
+            me.x = olam.width - me.width * 2
             me.xSpeed = 
             me.ySpeed = 0;
             
@@ -143,7 +151,7 @@ B"H
             ) {
                 me.poyneh -= me.soyvevSpeed
                 
-            }
+            } else 
 
             if(
                 olam
@@ -158,7 +166,7 @@ B"H
                 
                 me.poyneh += me.soyvevSpeed
                 
-            }
+            } else 
 
             if(
                 olam
@@ -175,12 +183,36 @@ B"H
                     olam.achbar.y - 
                     me.y
                 )
-
-                me.sovevLiHawsayv = Math.atan2(
+                
+                me.sovevLiHawsayv = -Math.atan2(
+                    me.achbarVectorX,
                     me.achbarVectorY,
-                    me.achbarVectorX
-                ) * 180/Math.PI;
+                    
+                ) * 180/Math.PI -90;
 
+                if(
+                    me.sovevLiHawsayv < 0 && 
+                    me.sovevLiHawsayv <= -180
+                ) {
+                    me.sovevLiHawsayv = me.maxPoyneh;
+                }
+
+                if(
+                    me.sovevLiHawsayv < 
+                    me.minPoyneh &&
+                    me.sovevLiHawsayv > -180
+                ) {
+                    
+                    me.sovevLiHawsayv = me.minPoyneh
+                }
+
+                
+
+                if(me.sovevLiHawsayv > me.maxPoyneh) {
+                    me.sovevLiHawsayv = me.maxPoyneh;
+                }
+
+                console.log(me.sovevLiHawsayv,me.sovevLiHawsayv>0)
                 var p = me.poyneh;
                 var s = me.sovevLiHawsayv;
                 if(
@@ -202,17 +234,19 @@ B"H
                 } else {
                     me.poyneh = me.sovevLiHawsayv
                 }
+/*
+                if(
+                    me.poyneh < me.minPoyneh
+                ) {
+                    me.poyneh = me.minPoyneh
+                }
+
+                if(me.poyneh > me.maxPoyneh) {
+                    me.poyneh = me.maxPoyneh;
+                }*/
             }
 
-            if(
-                me.poyneh < -60
-            ) {
-                me.poyneh = -60
-            }
-
-            if(me.poyneh > 60) {
-                me.poyneh = 60;
-            }
+            
             
             if(
                 me.y < 
@@ -236,7 +270,7 @@ B"H
             ) * me.speedAmount;
 
             me.x += me.xSpeed;
-            me.y += me.ySpeed;
+           // me.y += me.ySpeed;
             me.gawvawn = "blue"
 
             for(
@@ -255,7 +289,8 @@ B"H
                 if(
                     AWTSMOOS.Gawshmeeyoos.hittest(
                         me,
-                        ol.neevrayim[me.echad]
+                        ol.neevrayim[me.echad],
+                        ol
                     )
                 ) {
                     me.gawvawn="yellow"

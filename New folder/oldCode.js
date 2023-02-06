@@ -541,3 +541,96 @@ var html = document.createElement("div");
                         y:seeboovY
                     };
                 },
+
+
+
+
+                    /*
+                    olam.ctx.lineTo(
+                        rectCorner4RotatedX,
+                        rectCorner4RotatedY
+                    )
+
+                    olam.ctx.strokeStyle = "blue";
+                    olam.ctx.lineWidth = 4;
+
+                    olam.ctx.stroke();
+
+
+                    olam.ctx.beginPath();
+                    olam.ctx.arc(
+                        circleX,
+                        circleY,
+                        circleRadius,
+                        0,
+                        Math.PI*2,
+                        false
+                    );
+
+                    olam.ctx.strokeStyle = "yellow";
+                    olam.ctx.lineWidth = 7;
+                    olam.ctx.stroke();
+                    */
+
+
+                    
+                    olam.ctx.beginPath();
+                    olam.ctx.moveTo(
+                        rectCorner1RotatedX,
+                        rectCorner1RotatedY
+                    );
+
+                    olam.ctx.lineTo(
+                        rectCorner2RotatedX,
+                        rectCorner2RotatedY
+                    )
+                    
+                    olam.ctx.lineTo(
+                        rectCorner3RotatedX,
+                        rectCorner3RotatedY
+                    )
+
+
+                    
+function isPointInsideRectangleOld(pointX, pointY, rectX, rectY, rectWidth, rectHeight, rectRotation) {
+    // Rotate the point about the center of the rectangle
+    const rectCenterX = rectX + rectWidth / 2;
+    const rectCenterY = rectY + rectHeight / 2;
+    const rotatedX = (pointX - rectCenterX) * Math.cos(-rectRotation) - (pointY - rectCenterY) * Math.sin(-rectRotation) + rectCenterX;
+    const rotatedY = (pointX - rectCenterX) * Math.sin(-rectRotation) + (pointY - rectCenterY) * Math.cos(-rectRotation) + rectCenterY;
+
+    // Check if the point is inside the rectangle
+    return rotatedX >= rectX && rotatedX <= rectX + rectWidth && rotatedY >= rectY && rotatedY <= rectY + rectHeight;
+}
+
+var {
+    totalWidth,
+    totalHeight,
+    eachWidth,
+    eachHeight,
+    image,
+    rows,
+    columns
+} = olam.spriteSheet[
+    nivra.spriteSheet
+];
+console.log(
+    nivra._curSpriteFrame,
+    columns,
+    rows
+)
+olam.ctx.drawImage(
+    image, 
+    0,
+    (nivra._curSpriteFrame % rows)
+        *eachHeight,//get back to row logic later
+    eachWidth,
+    eachHeight,
+    0,0
+    
+
+    ,eachWidth,eachHeight
+    
+    
+)
+nivra._curSpriteFrame++;
