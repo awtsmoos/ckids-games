@@ -188,8 +188,8 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
-        rows = 2
-        //var max = 2//columns;
+    //    rows = 2
+    
         fetch(tseeyoor)
         .then(b=>b.blob())
         .then((b) => {
@@ -480,7 +480,7 @@ function Oyluhm(opts={}) {
 
         parent.addEventListener("touchend",e=>{
             _achbar.clicked = false;
-            
+
         })
 
         parent.addEventListener("touchmove",e=>{
