@@ -188,7 +188,7 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
-    //    rows = 2
+        rows = 2
     
         fetch(tseeyoor)
         .then(b=>b.blob())
@@ -906,6 +906,9 @@ function Oyluhm(opts={}) {
                     opts.bas ||
                     opts.yeled ||
                     opts.yelawdeem;
+                var attr = opts.attributes || opts.attr ||
+                    opts.toyreem;
+
                 
                 var childElements = () => el.children;
                 var getChild = nm => {
@@ -973,6 +976,11 @@ function Oyluhm(opts={}) {
                     st(el, getChild)
                 }
 
+                if(typeof(attr) == "object") {
+                    Object.keys(attr).forEach(q=>{
+                        el.setAttribute(q, attr[q]);
+                    })
+                }
                 return el;
             }
         },
@@ -1702,8 +1710,12 @@ function Oyluhm(opts={}) {
                         }
 
                         if(nivra.html) {
-                            nivra.html.style.left = nivra.x + "px";
-                            nivra.html.style.top = nivra.y + "px";
+                            nivra.html.style.left = (
+                                nivra.x - nivra.width/2
+                             ) + "px";
+                            nivra.html.style.top = (
+                                nivra.y - nivra.height/2
+                             ) + "px";
 
                             nivra.html.width = 
                                 nivra.html.style.width = 

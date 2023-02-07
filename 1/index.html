@@ -43,22 +43,21 @@ B"H
                         border-radius:15%;
                         background-color:rgba(0,0,0,0.8);
                         color:white;
-                        font-size:30px;
+                        font-size:5vw;
                         left:50%;
                         transform:translate(-50%,0);
                         border:1px solid black;
                     }
-
-                    .awnawnText > div {
-                        position:relative;
-                        top:50%;
-                        transform: translateY(-50%)
-                    }
                     .awnawnText {
-                        text-align:center;
-                        font-size:5vw;
-                        text-shadow:0px 0px 0px black;
+                        
+                        word-break:break-word;
+                        width:100%;
+                        position:absolute;
+                        top:50%;
+                        left:50%;
+                        transform:translate(-50%,-50%)
                     }
+                    
                 </style>`
             ]
         },
@@ -301,7 +300,7 @@ B"H
             
             if(
                 Date.now() -
-                me.lastTime > me.awnawneem
+                me.lastTime > (2+Math.random() * 3)*me.awnawneem
             ) {
                 
                 me.lastTime = Date.now()
@@ -348,8 +347,8 @@ B"H
     )
 
     function awsayAwnawn() {
-        var cloudRadius = 76;
-        var cloudSpeed = 5;
+        var cloudRadius = 76 + Math.random() * 50;
+        var cloudSpeed = 1 + Math.random() * 4;
         
         var awnawn = new AWTSMOOS.Domem({
             choymer: "eegool",
@@ -397,10 +396,23 @@ B"H
                 start(){
                    // console.log(me)
                 },
-                className:"awnawnText",
+                
                 tolda: {
-                    innerHTML: me.dayuh.answerOption.text
-                    ||""
+                    tag:"svg",
+                    attributes: {
+                        viewBox: "0 0 2000 2000"
+                    },
+                    tolda: {
+                        tag: "text",
+                        attributes: {
+                            x: "0",
+                            y: "0"
+                        },
+                        
+                        innerHTML: me.dayuh.answerOption.text
+                        ||""
+                    },
+                    className:"awnawnText",
                 }
                 
                 

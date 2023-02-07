@@ -1386,4 +1386,18 @@ function distToSegment(p, v, w) {
                         nivra.html.style.height =
                         nivra.height;
                 }
-                                    
+                        
+                
+
+                .awnawnTextd {
+                        
+                    text-align:center;
+                    font-size:30px;
+                    text-shadow:0px 0px 0px black;
+                    word-break:break-word;
+                    width:80%;
+                    position:relative;
+                    top:0;
+                    left:0;
+                    transform: translate(-50%,-50%)
+                }
