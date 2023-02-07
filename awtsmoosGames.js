@@ -188,7 +188,7 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
-        rows = 2
+       // rows = 2
     
         fetch(tseeyoor)
         .then(b=>b.blob())
