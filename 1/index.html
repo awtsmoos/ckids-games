@@ -1,5 +1,9 @@
 B"H
 <br>
+<h4 id="awtsmoosLoyding">Welcome! Loading..<br>
+    <div id="bar">
+
+    </div></h4>
 <script src="../awtsmoosGames.js"></script>
 <script>
  
@@ -27,6 +31,7 @@ B"H
                     }
                 },
                 /*html*/`<style>
+                    
                     body,html{
                         user-select:none
                     }
@@ -75,9 +80,18 @@ B"H
 
             await olam.spritesheet("player", {
                 progress({total,current}) {
-                    console.log("There: ",current/total);
+                    var perc  = current/total
+                    bar.style.display="block"
+                    bar.style.background="cyan"
+                    bar.style.height=50
+                    bar.style.width = perc + (perc * 400)
+                    bar.innerHTML = current +"/"+total;
+                    bar.style.textAlign="center";
+                    console.log("There: ",perc);
                 }
             })
+
+            awtsmoosLoyding.parentNode.removeChild(awtsmoosLoyding)
             
         },
         errors(er) {
@@ -97,14 +111,17 @@ B"H
         spriteSheet:"player",
         x:150,
         y:400,
-        width:126,
-        height:63,
+        width:300,
+        height:112,
         layer:0,
         tseeooyr: "player",
-        origin: me=>({
-            y: -me.height/2,
-            x: -me.width/2
-        }),
+        /*origin: me=>({
+            y: me.height/2,
+            x: me.width*2
+        }),*/
+        dayuh:{
+            meen: "me"
+        },
         heesCheel(me, olam) {
             console.log("Yo",me.spriteSheet)
             me.xSpeed = 0;
@@ -118,7 +135,7 @@ B"H
 
             me.sovevLiHawsayv/*angle to turn to*/   
                  = 0;
-            me.meen = "me"
+                 
 
             me.echad = 0;
             me.lastTime = Date.now();
@@ -135,7 +152,7 @@ B"H
         },
 
         heesHawvoos(me, olam) {
-            me.x = olam.width - me.width * 2
+            me.x = olam.width-me.width
             me.xSpeed = 
             me.ySpeed = 0;
             
@@ -146,10 +163,11 @@ B"H
                 ] ||
                 olam.keys[
                     "ArrowLeft"
-                ]
+                ] || 
+                olam.keys.w
 
             ) {
-                me.poyneh -= me.soyvevSpeed
+                me.poyneh += me.soyvevSpeed
                 
             } else 
 
@@ -161,10 +179,11 @@ B"H
                 
                 olam.keys[
                     "ArrowRight"
-                ]
+                ] ||
+                olam.keys.s
             ) {
                 
-                me.poyneh += me.soyvevSpeed
+                me.poyneh -= me.soyvevSpeed
                 
             } else 
 
@@ -173,14 +192,20 @@ B"H
                 .achbar
                 .clicked
             ) {
+                var achbarX = olam.achbar.x;
+                var achbarY = olam.achbar.y;
                 
+                if(achbarX > me.x-me.width) {
+                    achbarX = me.x-me.width;
+                }
+                console.log(achbarX,achbarY,olam.achbar.x)
                 me.achbarVectorX = (
-                    olam.achbar.x - 
+                    achbarX - 
                     me.x
                 )
 
                 me.achbarVectorY = (
-                    olam.achbar.y - 
+                    achbarY - 
                     me.y
                 )
                 
@@ -212,7 +237,7 @@ B"H
                     me.sovevLiHawsayv = me.maxPoyneh;
                 }
 
-                console.log(me.sovevLiHawsayv,me.sovevLiHawsayv>0)
+               
                 var p = me.poyneh;
                 var s = me.sovevLiHawsayv;
                 if(
@@ -235,18 +260,18 @@ B"H
                     me.poyneh = me.sovevLiHawsayv
                 }
 /*
-                if(
-                    me.poyneh < me.minPoyneh
-                ) {
-                    me.poyneh = me.minPoyneh
-                }
-
-                if(me.poyneh > me.maxPoyneh) {
-                    me.poyneh = me.maxPoyneh;
-                }*/
+                */
             }
 
-            
+            if(
+                me.poyneh < me.minPoyneh
+            ) {
+                me.poyneh = me.minPoyneh
+            }
+
+            if(me.poyneh > me.maxPoyneh) {
+                me.poyneh = me.maxPoyneh;
+            }
             
             if(
                 me.y < 
@@ -263,41 +288,16 @@ B"H
                 me.y = olam.height - me.height
             }
             
-            me.ySpeed = Math.sin(
+            me.ySpeed = -Math.sin(
                 me.poyneh * (
                     Math.PI / 180
                 )
             ) * me.speedAmount;
 
-            me.x += me.xSpeed;
-           // me.y += me.ySpeed;
+            //me.x += me.xSpeed;
+            me.y += me.ySpeed;
             me.gawvawn = "blue"
 
-            for(
-                me.echad = 0;
-                me.echad < ol.neevrayim.length;
-                me.echad++
-            ) {
-                if(
-                    ol.neevrayim[me.echad].dayuh.meen ==
-                    me.meen || 
-                    !me.meeneem.includes(ol.neevrayim[me.echad].dayuh.meen)
-                ) {
-                    
-                    continue;
-                }
-                if(
-                    AWTSMOOS.Gawshmeeyoos.hittest(
-                        me,
-                        ol.neevrayim[me.echad],
-                        ol
-                    )
-                ) {
-                    me.gawvawn="yellow"
-                    
-                    
-                }
-            }
             
             if(
                 Date.now() -
@@ -308,6 +308,36 @@ B"H
                 awsayAwnawn()
             }
 
+            
+            var i;
+            for(
+                i = 0;
+                i < ol.neevrayim.length;
+                i++
+            ) {
+                
+                
+                if(
+                    ol.neevrayim[i].dayuh.meen !=
+                    me.dayuh.meen
+                ) {
+                    
+                    if(
+                        AWTSMOOS.Gawshmeeyoos.hittest(
+                        me,
+                        ol.neevrayim[i],
+                        ol
+                    )
+                    ) {
+                        me.gawvawn="yellow"
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            
             
             
         }
@@ -329,7 +359,7 @@ B"H
                 ol.height -
                 cloudRadius * 2
             ),
-            x: ol.width + cloudRadius,
+            x: 0,
             width:cloudRadius*2,
             height:cloudRadius*2,
             
@@ -389,8 +419,8 @@ B"H
             heesHawvoos(me, olam) {
                 me.dayuh.reeb.x=me.x;
                 me.dayuh.reeb.y=me.y;
-                me.x -= cloudSpeed;
-                if(me.x < -me.width) {
+                me.x += cloudSpeed;
+                if(me.x > ol.width + cloudRadius) {
                     ol.Sealayk(me)
                 }
 

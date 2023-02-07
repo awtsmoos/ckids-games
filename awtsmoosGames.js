@@ -64,7 +64,7 @@ function Oyluhm(opts={}) {
         }
 
         .peulawAwv {
-            position:fixed;
+            position:absolute;
             left:0;top:0;
             width:100%;height:100%;
             z-index:18927;
@@ -188,6 +188,8 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
+        rows = 2
+        //var max = 2//columns;
         fetch(tseeyoor)
         .then(b=>b.blob())
         .then((b) => {
@@ -198,7 +200,8 @@ function Oyluhm(opts={}) {
             ) {
                 for(
                     x = 0;
-                    x < columns;
+                    x < columns
+                    ;
                     x++
                 ) {
                     bitmapHawvtawchos.push(
@@ -441,14 +444,14 @@ function Oyluhm(opts={}) {
     
 
     function setupShmeeyuh/*listen(ors)*/(){
-        peulawAwv.addEventListener("keydown", e=> {
+        addEventListener("keydown", e=> {
             zeh.keys[
                 e.key
             ] = true;
-            
+            console.log(e.key)
         })
     
-        peulawAwv.addEventListener("keyup", e=>{
+        addEventListener("keyup", e=>{
             zeh.keys[
                 e.key
             ] = false;
@@ -461,13 +464,31 @@ function Oyluhm(opts={}) {
 
         if(_mouseOptions) {
             achbarShmeeyuh()
+            touchEvents()
         }
 
 
     }
 
 
+    function touchEvents() {
+        parent.addEventListener("touchstart",e=>{
+            _achbar.clicked = true;
+            _achbar.x = e.touches[0].clientX;
+            _achbar.y = e.touches[0].clientY
+        })
 
+        parent.addEventListener("touchend",e=>{
+            _achbar.clicked = false;
+            
+        })
+
+        parent.addEventListener("touchmove",e=>{
+            //console.log(e.touches[0])
+            _achbar.x = e.touches[0].clientX;
+            _achbar.y = e.touches[0].clientY
+        })
+    }
     function achbarShmeeyuh() {/*mouse listener(s)*/
         parent.addEventListener("mousemove", e=> {
             _achbar.x = e.offsetX;
@@ -850,6 +871,7 @@ function Oyluhm(opts={}) {
                     },
                     width: {
                         get: ()=>currentWidth
+
                     },
                     html: {
                         get: ()=>html
@@ -957,6 +979,41 @@ function Oyluhm(opts={}) {
         Ayzareem: {
             
             get: ()=> ({
+                fitRectGetScale/*just get scale to fit one rect to other*/(
+                    rectSrc,rectDst
+                ) {
+                    return Math.min(
+                        rectDst.width/rectSrc.width,
+                        rectDst.height/rectSrc.height  
+                    )
+                },
+                fitRectToRectKeepAspect(rectSrc/*target*/,rectToFitToSrc) {
+                    var ws = rectSrc.width;
+                    var hs = rectSrc.height;
+                    var wo/*original width*/=rectToFitToSrc.width;
+                    var ho = rectToFitToSrc.height;
+
+                    var adjustedW = wo;
+                    var adjustedH = ho;
+
+                    var srcAspect = ws/hs;
+                    var curAspect = wo/ho;
+
+                    if(
+                        curAspect > srcAspect
+                    ) {
+                        adjustedH = hs;
+                        adjustedW = curAspect * hs;
+                    } else {
+                        adjustedW = ws;
+                        adjustedH = hs / curAspect
+                    }
+
+                    return /*new dimensions*/{
+                        width: adjustedW,
+                        height: adjustedH
+                    }
+                },
                 encodeCheftsa(dayuh/*data*/){
                     return new Blob([
                         "//B\"H<br><script>\n"
@@ -1022,10 +1079,16 @@ function Oyluhm(opts={}) {
                 Object.defineProperties(
                     this, {
                         width: {
-                            get: () => this.roychawv
+                            get: () => this.roychawv,
+                            set: v  => {
+                                this.roychawv = v;
+                            }
                         },
                         height: {
-                            get: () => this.oyrech
+                            get: () => this.oyrech,
+                            set: v  => {
+                                this.oyrech = v;
+                            }
                         },
                         rotation: {
                             get: () => this.poyneh,
@@ -1057,8 +1120,7 @@ function Oyluhm(opts={}) {
                 
         
                 
-                this.heesHawvoos = opts.heesHawvoos ||
-                    opts.update || null;
+                
         
                 var _spriteSheet = opts.sprite 
                     || opts.tseeooyr ||
@@ -1082,7 +1144,11 @@ function Oyluhm(opts={}) {
 
                 
                 var _cheftsuhInfo;
-                    
+                var _scaler = null;
+                var _cheftsuhOffset = {
+                    x:0,y:0
+                }
+
                 this.heesCheel = (me, olam) => {
                     var hees = opts.heesCheel ||
                     opts.start || null;
@@ -1091,8 +1157,73 @@ function Oyluhm(opts={}) {
                         var ch = olam.chefawtseem[_spriteSheet];
                         if(ch) {
                             _cheftsuhInfo = ch;
+                            if(ch.collisionMask) {
+                                _scaler = AWTSMOOS
+                                .Ayzareem
+                                .fitRectGetScale(
+                                    
+                                    ch.collisionMask,
+                                    this
+                                )
+                            }
                         }
                     }
+
+                    this.heesHawvoos = (me,olam) => {
+                        var heesHawv = opts.heesHawvoos ||
+                        opts.update || null;
+                        
+                        if(_cheftsuhInfo) {
+                            if(_cheftsuhInfo.collisionMask) {
+                                _cheftsuhOffset.x = 
+                                _cheftsuhInfo.collisionMask.x - 
+                                this.x;
+
+                                _cheftsuhOffset.y = 
+                                _cheftsuhInfo.collisionMask.y - 
+                                this.y;
+
+                                _scaler = AWTSMOOS
+                                .Ayzareem
+                                .fitRectGetScale(
+                                    
+                                    ch.collisionMask,
+                                    this
+                                )
+                                var scaledColW = _cheftsuhInfo
+                                .collisionMask
+                                .width * _scaler;
+
+                                var scaledColH = _cheftsuhInfo
+                                .collisionMask
+                                .height * _scaler;
+
+                                if(
+                                    this.width >
+                                    scaledColW
+
+                                ) {
+                                    this.width = scaledColW
+                                    
+                                }
+
+                                if(
+                                    this.height >
+                                    scaledColH
+
+                                ) {
+                                    this.height = scaledColH
+                                    
+                                }
+                            }
+                            
+                        }
+                        if(typeof(heesHawv) == "function") {
+                            heesHawv(me, olam);
+                        }
+                        
+                    };
+
                     if(typeof(hees) == "function") {
                         hees(me, olam)
                     }
@@ -1103,6 +1234,7 @@ function Oyluhm(opts={}) {
                     this.dayuh = this.dayuh(this)
                 }
                 var _html;
+                
                 Object.defineProperties(this, {
                     radius: {
                         get: () => Math.max
@@ -1111,6 +1243,12 @@ function Oyluhm(opts={}) {
                     spriteSheet: {
                         get: () => _spriteSheet?
                         _spriteSheet:null
+                    },
+                    scaler: {
+                        get: () => _scaler
+                    },
+                    cheftsuhOffset: {
+                        get: () => _cheftsuhOffset
                     },
                     cheftsuh: {
                         get: () => {
@@ -1148,84 +1286,163 @@ function Oyluhm(opts={}) {
         },
         Gawshmeeyoos: {
             get: () => ({
-                
-                isRectangleCircleColliding(
-                    circleX, 
-                    circleY, 
-                    circleRadius, 
-                    rectX, 
-                    rectY, 
-                    rectWidth, 
-                    rectHeight, 
-                    rectRotation,
-                    olam
-                ) {
+                hittest(rect,circle,ol) {
+                      // Get the rectangle's vertices after rotation
+                    var vertices = getRotatedRectVertices(rect);
+                    var oldL = ol.ctx.lineWidth
+                    ol.ctx.beginPath()
+                    ol.ctx.moveTo(vertices[0].x,vertices[0].y)
+                    vertices.forEach(q=>{
+                        ol.ctx.lineTo(q.x,q.y)
+                    })
+                    ol.ctx.lineTo(vertices[0].x,vertices[0].y)
+                    ol.ctx.fillStyle="purple"
+                    ol.ctx.strokeStyle="orange"
+                    ol.ctx.lineWidth=13;
                     
-                    const rectCorner1X = rectX// - rectWidth / 2,
-                        rectCorner1Y = rectY// - rectHeight / 2,
+                    ol.ctx.stroke();
+                    ol.ctx.fill();
 
-                        rectCorner2X = rectX + rectWidth,
-                        rectCorner2Y = rectY,
 
-                        rectCorner3X = rectX + rectWidth,
-                        rectCorner3Y = rectY + rectHeight,
-                        rectCorner4X = rectX,
-                        rectCorner4Y = rectY + rectHeight;
-                    
-                    const rectCorner1RotatedX = (rectCorner1X - rectX) * Math.cos(rectRotation) - (rectCorner1Y - rectY) * Math.sin(rectRotation) + rectX,
-                        rectCorner1RotatedY = (rectCorner1X - rectX) * Math.sin(rectRotation) + (rectCorner1Y - rectY) * Math.cos(rectRotation) + rectY,
-                        
-                        rectCorner2RotatedX = (rectCorner2X - rectX) * Math.cos(rectRotation) - (rectCorner2Y - rectY) * Math.sin(rectRotation) + rectX,
-                        rectCorner2RotatedY = (rectCorner2X - rectX) * Math.sin(rectRotation) + (rectCorner2Y - rectY) * Math.cos(rectRotation) + rectY,
-                        
-                        rectCorner3RotatedX = (rectCorner3X - rectX) * Math.cos(rectRotation) - (rectCorner3Y - rectY) * Math.sin(rectRotation) + rectX,
-                        rectCorner3RotatedY = (rectCorner3X - rectX) * Math.sin(rectRotation) + (rectCorner3Y - rectY) * Math.cos(rectRotation) + rectY,
-                        
-                        rectCorner4RotatedX = (rectCorner4X - rectX) * Math.cos(rectRotation) - (rectCorner4Y - rectY) * Math.sin(rectRotation) + rectX,
-                        rectCorner4RotatedY = (rectCorner4X - rectX) * Math.sin(rectRotation) + (rectCorner4Y - rectY) * Math.cos(rectRotation) + rectY;
-                
+                    ol.ctx.lineWidth=oldL
+                    /*
+                    vertices=vertices.map(q=>[
+                        q.x,q.y
+                    ]);*/
 
-                    if (isPointInsideCircle(circleX, circleY, circleRadius, rectCorner1RotatedX, rectCorner1RotatedY) ||
-                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner2RotatedX, rectCorner2RotatedY) ||
-                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner3RotatedX, rectCorner3RotatedY) ||
-                        isPointInsideCircle(circleX, circleY, circleRadius, rectCorner4RotatedX, rectCorner4RotatedY)) {
-                        return true;
+                    // Check if the circle intersects any of the rectangle's sides
+                    let intersect = false;
+                    for (let i = 0; i < vertices.length; i++) {
+                        let next = (i + 1) % vertices.length;
+                        intersect = intersect || lineCircleIntersect(
+                            [
+                                vertices[i], 
+                                vertices[next]
+                            ]
+                            , 
+                            circle
+                        );
                     }
 
-                    const rectMinX = Math.min(rectCorner1RotatedX, rectCorner2RotatedX, rectCorner3RotatedX, rectCorner4RotatedX);
-                    const rectMinY = Math.min(rectCorner1RotatedY, rectCorner2RotatedY, rectCorner3RotatedY, rectCorner4RotatedY);
-                    const rectMaxX = Math.max(rectCorner1RotatedX, rectCorner2RotatedX, rectCorner3RotatedX, rectCorner4RotatedX);
-                    const rectMaxY = Math.max(rectCorner1RotatedY, rectCorner2RotatedY, rectCorner3RotatedY, rectCorner4RotatedY);
-                    
-                    rectX = rectMinX - circleRadius;
-                    rectY = rectMinY - circleRadius;
-                    rectWidth = rectMaxX - rectMinX + circleRadius * 2;
-                    rectHeight = rectMaxY - rectMinY + circleRadius * 2;
-                    
-                    if (circleX >= rectX && circleX <= rectX + rectWidth && circleY >= rectY && circleY <= rectY + rectHeight) {
-                      return true;
-                    }
+                    if(intersect) return true;
 
+                    // Check if the circle is inside the rectangle
+                    let inside = circlePolygonIntersect(
+                        circle, vertices
+                    );
+                    if (inside) return true;
+                    
                     return false;
-                    var centerRectX = rectX +rectWidth/2;
-                    var centerRectY = rectY +rectHeight/2
-
-                    if(
-                        isPointInsideRectangle(
-                            rectX - circleRadius,
-                            rectY - circleRadius,
-                            rectX,
-                            rectY,
-                            rectWidth + 2 * circleRadius,
-                            rectHeight + 2 * circleRadius,
-                            rectRotation,
-                            circleX,
-                            circleY
-                        )
-                    ) {
-                        return true;
+                    
+                    // Utility function to get the vertices of a rotated rectangle
+                    function getRotatedRectVertices(rect) {
+                        const vertices = [];
+                        const origin ={x:0,y:0}// rect.origin;
+                        const x = rect.x + origin.x;
+                        const y = rect.y + origin.y;
+                        const w = rect.width;
+                        const h = rect.height;
+                        const angle = rect.poyneh * (Math.PI / 180);
+                    
+                        vertices.push({x: x + w / 2, y: y - h / 2});
+                        vertices.push({x: x + w / 2, y: y + h / 2});
+                        vertices.push({x: x - w / 2, y: y + h / 2});
+                        vertices.push({x: x - w / 2, y: y - h / 2});
+                    
+                        // Rotate the vertices around the origin
+                        const c = Math.cos(angle);
+                        const s = Math.sin(angle);
+                        for (let i = 0; i < vertices.length; i++) {
+                        let v = vertices[i];
+                        let dx = v.x - x;
+                        let dy = v.y - y;
+                        v.x = x + c * dx - s * dy;
+                        v.y = y + s * dx + c * dy;
+                        }
+                    
+                        return vertices;
                     }
-                    return false;
+                    
+                    
+                    function lineCircleIntersect(line, circle) {
+                        var p1 = line[0];
+                        var p2 = line[1];
+
+                        let x1 = p1.x;
+                        let y1 = p1.y;
+                        let x2 = p2.x;
+                        let y2 = p2.y;
+                        let cx = circle.x;
+                        let cy = circle.y;
+                        let r = circle.radius;
+                      
+                        let d = dist2(p1, p2);
+                        let dot = (((cx - x1) * (x2 - x1)) + ((cy - y1) * (y2 - y1))) / Math.pow(d, 2);
+                      
+                        let closestX = x1 + (dot * (x2 - x1));
+                        let closestY = y1 + (dot * (y2 - y1));
+                      
+                        if (dot < 0) {
+                          closestX = x1;
+                          closestY = y1;
+                        } else if (dot > 1) {
+                          closestX = x2;
+                          closestY = y2;
+                        }
+                      
+                        let distance = dist2({ x: closestX, y: closestY }, { x: cx, y: cy });
+                      
+                        return distance < Math.pow(r, 2);
+                      }
+
+                      function dist2(v, w) {
+                        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+                      }
+
+
+                      // Function to check if a point is inside the circle
+                    function pointInCircle(point, circle) {
+                        let x = point.x - circle.x;
+                        let y = point.y - circle.y;
+                        return x * x + y * y <= circle.radius * circle.radius;
+                    }
+
+                    
+                    function circlePolygonIntersect(circle, polygon) {
+                        for (let i = 0; i < polygon.length - 1; i++) {
+                          const lineStart = polygon[i];
+                          const lineEnd = polygon[i + 1];
+                          const closestPoint = closestPointOnSegment(circle.x, circle.y, lineStart, lineEnd);
+                          const distance = distanceBetweenPoints(circle.x, circle.y, closestPoint.x, closestPoint.y);
+                          if (distance < circle.radius) {
+                            return true;
+                          }
+                        }
+                      
+                        const lastLineStart = polygon[polygon.length - 1];
+                        const firstLineEnd = polygon[0];
+                        const closestPoint = closestPointOnSegment(circle.x, circle.y, lastLineStart, firstLineEnd);
+                        const distance = distanceBetweenPoints(circle.x, circle.y, closestPoint.x, closestPoint.y);
+                        if (distance < circle.radius) {
+                          return true;
+                        }
+                      
+                        return false;
+                      }
+                      
+                      function closestPointOnSegment(x, y, lineStart, lineEnd) {
+                        const lerpValue = Math.max(0, Math.min(1, ((x - lineStart.x) * (lineEnd.x - lineStart.x) + (y - lineStart.y) * (lineEnd.y - lineStart.y)) /
+                          ((lineEnd.x - lineStart.x) ** 2 + (lineEnd.y - lineStart.y) ** 2)));
+                        return {
+                          x: lineStart.x + lerpValue * (lineEnd.x - lineStart.x),
+                          y: lineStart.y + lerpValue * (lineEnd.y - lineStart.y),
+                        };
+                      }
+                      
+                      function distanceBetweenPoints(x1, y1, x2, y2) {
+                        return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                      }
+                      
                 },
                 getBoundingBox(rect) {
                     var {
@@ -1248,48 +1465,11 @@ function Oyluhm(opts={}) {
                     );
                     
                 },
-                hittest(rect1,rect2,drawInfo) {
-                    var greater = Math.max(
-                        rect1.width, rect1.height
-                    )
-                    /*
-                    var boxTest = AWTSMOOS.Gawshmeeyoos
-                        .rect2rectHittest({
-                            x: rect1.x - greater,
-                            y: rect1.y - greater,
-                            width: greater * 2,
-                            height: greater * 2
-                        }, rect2)*/
-                    //if(!boxTest) return false;
-                    if(
-                        
-                        rect1.choymer == "reebooyah" &&
-                        rect2.choymer == "eegool" 
-                    ) {
-                        
-                        var rectToCircleTest = AWTSMOOS
-                            .Gawshmeeyoos
-                            .isRectangleCircleColliding(
-                                rect2/*really circle*/.x,
-                                rect2.y,
-                                rect2.radius,
-                                rect1.x,
-                                rect1.y,
-                                rect1.width,
-                                rect1.height,
-                                rect1.rotation*Math.PI/180,
-                                drawInfo
-                            )
-                            
-                        return rectToCircleTest;
-
-                    } else {
-                        console.log(rect1.choymer)
-                        return boxTest;
-                    }
-                }
-            })
+                
+            }),
+            
         },
+        
         SeyderHabreeuh/*
             order / list of creation
             (shapes)
@@ -1297,8 +1477,8 @@ function Oyluhm(opts={}) {
             get: () => ({
                 "reebooyah": (nivra, olam) => {
                     olam.ctx.fillRect(
-                        nivra.origin.x,
-                        nivra.origin.y,
+                        -nivra.width/2,
+                        -nivra.height/2,
 
                         nivra.roychawv,
                         nivra.oyrech 
@@ -1365,8 +1545,12 @@ function Oyluhm(opts={}) {
                             0,/*rotateX, do manually later*/
                             0,/*rotateY...*/
                             1,/*scaleY*/
-                            nivra.x,/*translateX amount*/
-                            nivra.y,
+                            nivra.x
+                            
+                            ,/*translateX amount*/
+                            nivra.y
+                            
+                            ,
                         )
                         
                         if(
@@ -1419,14 +1603,70 @@ function Oyluhm(opts={}) {
                             } = olam.spriteSheets[
                                 nivra.spriteSheet
                             ];
+                            var spriteX = 0//nivra.origin.x;
+                            var spriteY = 0//nivra.origin.y;
+                            
+                            var scw = eachWidth*nivra.scaler
+                            var sch = eachHeight*nivra.scaler//scaled height
 
-                            olam.ctx.strokeStyle="blue";
+                            var offsetX = 0;
+                            var offsetY = 0;
+
+                            offsetX -= nivra.width/2;
+                            offsetY -= nivra.height/2;
+
+                            //offsetY -= sch/2
+                            //offsetX += scw/2
+                            if(collisionMask) {
+                                var cmx = collisionMask.x
+                                    *nivra.scaler
+
+                                var cmy = collisionMask.y
+                                    *nivra.scaler
+
+                                var cw = collisionMask.width
+                                    *nivra.scaler;
+
+                                var ch = collisionMask.height
+                                    *nivra.scaler;
+                              //  var dif = nivra.x - cmx;
+
+                                offsetX -= cmx
+                                offsetY -= cmy
+                              //  spriteX-=cw;
+                               // spriteY-=ch;
+
+                                var dstX = cmx-nivra.origin.x
+                                var dstY = cmy-nivra.origin.y
+
+
+                               // spriteX -= dstX;
+                               // spriteY -= dstY;
+
+
+                                olam.ctx.strokeRect(
+                                   
+                                    cmx + offsetX,
+                                    cmy + offsetY,
+                                    
+                                   
+                                    cw
+                                    ,
+                                    ch
+                                )
+                            }
+
+                            
+                            olam.ctx.strokeStyle="cyan";
                             olam.ctx.strokeRect(
-                                nivra.origin.x,
-                                nivra.origin.y
+                                spriteX+offsetX,
+                                spriteY+offsetY
                                
 
-                                ,eachWidth,eachHeight
+                                ,
+                                scw
+                                ,
+                                sch
                             )
 
                             
@@ -1439,24 +1679,24 @@ function Oyluhm(opts={}) {
                                 eachWidth,
                                 eachHeight,
                                 
-                                nivra.origin.x,
-                                nivra.origin.y
+                                spriteX+offsetX
+                                   // +nivra.cheftsuhOffset.x
+                                   ,
+                                spriteY+offsetY
+                                    //+nivra.cheftsuhOffset.y
                                 //0,0
 
-                                ,eachWidth,eachHeight
+                                ,
+                                scw
+                                ,
+                                sch
                                 
                                 
                             )
 
                             olam.ctx.strokeStyle="yellow";
-                            if(collisionMask) {
-                                olam.ctx.strokeRect(
-                                    collisionMask.x,
-                                    collisionMask.y,
-                                    collisionMask.width,
-                                    collisionMask.height
-                                )
-                            }
+
+
                             nivra._curSpriteFrame++;
 
                         }
