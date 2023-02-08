@@ -1401,3 +1401,279 @@ function distToSegment(p, v, w) {
                     left:0;
                     transform: translate(-50%,-50%)
                 }
+
+
+                
+                tolda: {
+                    tag:"svg",
+                    attributes: {
+                        viewBox: "0 0 300 24",
+                        width:"100%",
+                        height:"100%",
+                        xmlns: "http://www.w3.org/2000/svg"
+                    },
+                    tolda: {
+                        tag: "text",
+                        attributes: {
+                            lengthAdjust:"spacing",
+                            x: "0",
+                            y: "0"
+                        },
+                        
+                        innerHTML: me.dayuh.answerOption.text
+                        ||""
+                    },
+                    className:"awnawnText",
+                }
+
+
+                adjustTextToFit(element) {
+                    let fontSize = 1;
+                    let originalPosition = element.style.position;
+                    let originalDisplay = element.style.display;
+                    
+                    element.style.position = 'static';
+                    element.style.display = 'block';
+                    element.style.wordBreak = 'break-word';
+                    element.style.wordWrap = 'break-word';
+                    element.style.overflowWrap = 'break-word';
+                    
+                    element.style.fontSize = fontSize + 'px';
+                    
+                    while (false&&
+                        element.scrollHeight <= element.offsetHeight
+                         || element.scrollWidth <= element.offsetWidth
+                        ) {
+                            console.log(
+                                fontSize,
+                                element.scrollHeight,
+                                element.offsetHeight,
+                                element.scrollWidth,
+                                element.offsetWidth
+                            )
+                      fontSize++;
+                      element.style.fontSize = fontSize + 'px';
+                      console.log(23)
+                    }
+                    
+                    
+                    element.style.position = originalPosition;
+                    element.style.display = originalDisplay;
+                  }
+
+
+
+
+
+                  function detectLineCircleCollision(lineStart, lineEnd, circle) {
+                    let x1 = lineStart[0];
+                    let y1 = lineStart[1];
+                    let x2 = lineEnd[0];
+                    let y2 = lineEnd[1];
+                  
+                    let cx = circle.x;
+                    let cy = circle.y;
+                    let r = circle.radius;
+                      
+                    let dx = x2 - x1;
+                    let dy = y2 - y1;
+                    let fx = x1 - cx;
+                    let fy = y1 - cy;
+                  
+                    let a = dx * dx + dy * dy;
+                    let b = 2 * (fx * dx + fy * dy);
+                    let c = fx * fx + fy * fy - r * r;
+                  
+                    console.log(
+                      "Hi ChatGPT, heres lineStart",
+                      lineStart,"lineEnd",
+                      lineEnd,"circle info:",{
+                         x:circle.x,
+                         y:circle.y,
+                         radius:circle.radius
+                      }
+                    )
+                    if (a <= 0.0000001) {
+                      return false;
+                    }
+                  
+                    let discriminant = b * b - 4 * a * c;
+                    if (discriminant < 0) {
+                      return false;
+                    }
+                  
+                    let t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                    let t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                    if (t1 >= 0 && t1 <= 1 || t2 >= 0 && t2 <= 1) {
+                      return true;
+                    }
+                    
+                    return false;
+                  }   
+                      
+                  function rotatePoint(x, y, centerX, centerY, angle) {
+                      let newX = Math.cos(angle) * (x - centerX) - Math.sin(angle) * (y - centerY) + centerX;
+                      let newY = Math.sin(angle) * (x - centerX) + Math.cos(angle) * (y - centerY) + centerY;
+                      return {
+                          x: newX,
+                          y: newY
+                      };
+                  }
+                  function isCircleIntersectingLine(circleX, circleY, circleRadius, lineX1, lineY1, lineX2, lineY2) {
+                      // Find the closest point on the line to the center of the circle
+                      const dx = lineX2 - lineX1;
+                      const dy = lineY2 - lineY1;
+                      const t = ((circleX - lineX1) * dx + (circleY - lineY1) * dy) / (dx * dx + dy * dy);
+                      let closestX = lineX1 + t * dx;
+                      let closestY = lineY1 + t * dy;
+                  
+                      // If t is less than 0, the closest point is lineX1, lineY1
+                      if (t < 0) {
+                          closestX = lineX1;
+                          closestY = lineY1;
+                      }
+                  
+                      // If t is greater than 1, the closest point is lineX2, lineY2
+                      if (t > 1) {
+                          closestX = lineX2;
+                          closestY = lineY2;
+                      }
+                  
+                      // Check if the distance between the center of the circle and the closest point on the line is less than the radius of the circle
+                      const distance = Math.sqrt((circleX - closestX) ** 2 + (circleY - closestY) ** 2);
+                      return distance < circleRadius;
+                  }
+                  function isPointInsideRectangle(rectX, rectY, rectWidth, rectHeight, rectRotation, pointX, pointY) {
+                      const rectCenterX = rectX + rectWidth / 2;
+                      const rectCenterY = rectY + rectHeight / 2;
+                  
+                      const unrotatedX = (pointX - rectCenterX)
+                       * Math.cos(rectRotation) 
+                      + (pointY - rectCenterY) 
+                      * Math.sin(rectRotation)
+                       + rectCenterX;
+                  
+                      const unrotatedY = -(pointX - rectCenterX) 
+                      * Math.sin(rectRotation) 
+                      + (pointY - rectCenterY) 
+                      * Math.cos(rectRotation) + rectCenterY;
+                  
+                      if (
+                          unrotatedX >= rectX && 
+                          unrotatedX <= rectX + rectWidth && 
+                          unrotatedY >= rectY && 
+                          unrotatedY <= rectY + rectHeight
+                      ) {
+                          return true;
+                      }
+                  
+                      return false;
+                  }
+                  
+                  // Helper function to check if a point is within an oval
+                  function isPointInOval(x, y, oval) {
+                      let ovalX = oval.x + oval.width / 2;
+                      let ovalY = oval.y + oval.height / 2;
+                      let halfWidth = oval.width / 2;
+                      let halfHeight = oval.height / 2;
+                      let normalizedX = (x - ovalX) / halfWidth;
+                      let normalizedY = (y - ovalY) / halfHeight;
+                      return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
+                  }
+                  function getDistance(x1, y1, x2, y2) {
+                      let dx = x2 - x1;
+                      let dy = y2 - y1;
+                      return Math.sqrt(dx * dx + dy * dy);
+                    }
+                  
+                    
+                  //check if a point is inside a circle
+                  function isPointInsideCircle(cx, cy, cradius, px, py) {
+                      let distance = distanceBetweenPoints(cx, cy, px, py);
+                      return distance <= cradius;
+                    }
+                    
+                    //find the distance between two points
+                    function distanceBetweenPoints(x1, y1, x2, y2) {
+                      let dx = x2 - x1;
+                      let dy = y2 - y1;
+                      return Math.sqrt(dx * dx + dy * dy);
+                    }
+                    
+
+function getRotatedRectanglePoints(rect) {
+    let x = rect.x;
+    let y = rect.y;
+    let w = rect.width;
+    let h = rect.height;
+    let r = rect.rotation * Math.PI/180;
+  
+    let x1 = x + (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
+    let y1 = y + (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
+  
+    let x2 = x + (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
+    let y2 = y - (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
+  
+    let x3 = x - (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
+    let y3 = y - (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
+  
+    let x4 = x - (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
+    let y4 = y + (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
+  
+    return [[x1,y1], [x2,y2], [x3,y3], [x4,y4]];
+  }
+  adjustTextToFit(element) {
+    let fontSize = 1;
+    let originalPosition = element.style.position;
+    let originalDisplay = element.style.display;
+    
+    //element.style.position = 'static';
+    //element.style.display = 'block';
+   /*
+    element.style.wordBreak = 'break-word';
+    element.style.wordWrap = 'break-word';
+    element.style.overflowWrap = 'break-word';
+*/
+    element.style.fontSize = fontSize + 'px';
+    console.log(
+
+        fontSize,
+        "height",
+        element.innerHTML,
+        element.scrollHeight,
+        element.offsetHeight,
+        element.scrollWidth,
+        element.offsetWidth
+    )
+    
+    while (
+        element
+        .scrollHeight <=
+        element.offsetHeight
+    ) {
+            console.log(
+                fontSize,
+                element.scrollHeight,
+                element.offsetHeight,
+                element.scrollWidth,
+                element.offsetWidth
+            )
+      fontSize++;
+      element.style.fontSize = fontSize + 'px';
+      
+    }
+    
+    
+    element.style.position = originalPosition;
+    element.style.display = originalDisplay;
+  }
+  
+  .awnawnText {
+                        
+    word-break:break-word;
+    width:100%;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%)
+}

@@ -48,14 +48,17 @@ B"H
                         transform:translate(-50%,0);
                         border:1px solid black;
                     }
-                    .awnawnText {
+
+                    .awnawnTextHolder {
                         
-                        word-break:break-word;
-                        width:100%;
+                        text-align:center
+                    }
+
+                    .awnawnTextHolder > div {
                         position:absolute;
                         top:50%;
                         left:50%;
-                        transform:translate(-50%,-50%)
+                        transform:translate(-50%,-50%);
                     }
                     
                 </style>`
@@ -106,6 +109,7 @@ B"H
     }
 
     boyray();
+    
     var tseepoor = new AWTSMOOS.Domem({
         spriteSheet:"player",
         x:150,
@@ -122,6 +126,8 @@ B"H
             meen: "me"
         },
         heesCheel(me, olam) {
+            
+
             console.log("Yo",me.spriteSheet)
             me.xSpeed = 0;
             me.ySpeed = 0;
@@ -140,14 +146,14 @@ B"H
             me.lastTime = Date.now();
 
             me.awnawneem = 770
-            awsayAwnawn()
+            ///
             me.meeneem = [
                 "awnawn"
             ]
 
             me.minPoyneh = -63
             me.maxPoyneh = 46;
-        
+            awsayAwnawn()
         },
 
         heesHawvoos(me, olam) {
@@ -165,7 +171,7 @@ B"H
                 ] || 
                 olam.keys.w ||
                 olam.keys.W ||
-                
+
                 olam.keys.a ||
                 olam.keys.A
 
@@ -205,7 +211,7 @@ B"H
                 if(achbarX > me.x-me.width) {
                     achbarX = me.x-me.width;
                 }
-                console.log(achbarX,achbarY,olam.achbar.x)
+                
                 me.achbarVectorX = (
                     achbarX - 
                     me.x
@@ -317,6 +323,7 @@ B"H
 
             
             var i;
+            var neev;
             for(
                 i = 0;
                 i < ol.neevrayim.length;
@@ -328,15 +335,18 @@ B"H
                     ol.neevrayim[i].dayuh.meen !=
                     me.dayuh.meen
                 ) {
-                    
+                    neev = ol.neevrayim[i]
                     if(
                         AWTSMOOS.Gawshmeeyoos.hittest(
                         me,
-                        ol.neevrayim[i],
+
+                        neev
+                        ,
                         ol
                     )
                     ) {
-                        me.gawvawn="yellow"
+                        me.gawvawn=neev.dayuh.answerOption.isRight?
+                        "green" :"red"
                         
                         
                     }
@@ -358,6 +368,7 @@ B"H
         var cloudRadius = 76 + Math.random() * 50;
         var cloudSpeed = 1 + Math.random() * 4;
         
+        var needsResize = false;
         var awnawn = new AWTSMOOS.Domem({
             choymer: "eegool",
             layer:1,
@@ -366,7 +377,7 @@ B"H
                 ol.height -
                 cloudRadius * 2
             ),
-            x: 0,
+            x: -cloudRadius*2,
             width:cloudRadius*2,
             height:cloudRadius*2,
             
@@ -399,46 +410,65 @@ B"H
                 :{isRight:true}
             })
             ,
-            alpha:0.3,
+            alpha:0.7,
             html: me => ({
-                start(){
-                   // console.log(me)
+                onSheenooy/*onchange, happens 
+                    sometimse when HTML is changed*/(html){
+                    me.dayuh.avGoyvuh=html.offsetHeight
+                    me.dayuh.bounds=html.getBoundingClientRect()
+                    
+                    window.w=html
                 },
+                className:"awnawnTextHolder",
                 
-                tolda: {
-                    tag:"svg",
-                    attributes: {
-                        viewBox: "0 0 2000 2000"
-                    },
-                    tolda: {
-                        tag: "text",
-                        attributes: {
-                            x: "0",
-                            y: "0"
-                        },
+                tolda: (search, parent) => ({
+                    innerHTML: me.dayuh.answerOption.text
+                        ||"",
+                    onSheenooy(h) {
+                        needsResize = true;
+                     
+                        /*first calculate 
+                            box that fits in circle in box
+                            of av height:
+
+                        */
                         
-                        innerHTML: me.dayuh.answerOption.text
-                        ||""
-                    },
-                    className:"awnawnText",
-                }
-                
+                       
+                        window.h=h;
+                    }
+                })
                 
             }),
             color:"gray",
             
             heesCheel(me,olam) {
-                console.log(555,)
-               // olam.BoyrayNeevrah(me.dayuh.reeb)
+                console.log(555)
+                
                 me.gotTime = 1000/*
                     amount of time "gotten"
                     animation should play for
                 */
                 me.curTime = 0;
+                
+                
             },
             heesHawvoos(me, olam) {
-                me.dayuh.reeb.x=me.x;
-                me.dayuh.reeb.y=me.y;
+                if(needsResize) {
+                    var heightOfSquareInCircleInSquare = (
+                        me.dayuh.avGoyvuh * Math.sqrt(2) / 2
+                    )
+                    AWTSMOOS.Ayzareem.adjustTextToFit(
+                        h,
+                        heightOfSquareInCircleInSquare
+                    )
+                    
+                    /*
+                        adjust font size to fit it
+                    */
+                    needsResize = false
+                }
+                
+                
                 me.x += cloudSpeed;
                 if(me.x > ol.width + cloudRadius) {
                     ol.Sealayk(me)

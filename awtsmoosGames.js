@@ -98,7 +98,8 @@ function Oyluhm(opts={}) {
 
     var _readyQueue = []
     var _isReady = false;
-
+    var _started = false;
+    var _did = 0;
     zeh.BoyrayNeevrah = nivra => {
         var exists = zeh.neevrayim.indexOf(nivra);
         if(exists < 0) {
@@ -111,7 +112,10 @@ function Oyluhm(opts={}) {
                 nivra.heesCheel
             ) == "function") {
                 var start = function() {
+                    
                     ((nivra,zeh)=>{
+                        _did++
+                        
                         nivra.heesCheel(
                         nivra, zeh
                         )
@@ -119,13 +123,15 @@ function Oyluhm(opts={}) {
                 }
 
                 
-                if(_isReady) {
+                if(_isReady || _started) {
                     start()
-                } else {
+                } else if(!_started) {
                     _readyQueue.push(
                         start
                     );
                 }
+
+                
             }
             resize();
         }
@@ -178,7 +184,7 @@ function Oyluhm(opts={}) {
             tseeyoor
         } = _loadedCheftawtseem[cheftsaName];
 
-        console.log(_loadedCheftawtseem[cheftsaName])
+        
         var sprites = [];
 
         var bitmapHawvtawchos = [];
@@ -188,7 +194,7 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
-       // rows = 2
+     //   rows = 2
     
         fetch(tseeyoor)
         .then(b=>b.blob())
@@ -310,7 +316,9 @@ function Oyluhm(opts={}) {
                 .then(r).catch(j)
             }))
         })
-        
+        if(!promises.length) {
+            ready()
+        }
         Promise.all(promises)
         .then(q=>{
 
@@ -333,10 +341,10 @@ function Oyluhm(opts={}) {
                 || typeof(chawfawtseem)
                 != "object"
         ) {
-            console.log("reall2y?",chawfawtseem)
+            
             ready()
         } else {
-            console.log("really?")
+            
             var hawvtawchos = [];
             Object.keys(chawfawtseem).forEach(key=>{
                 hawvtawchos.push(new Promise((r,j) => {
@@ -353,9 +361,11 @@ function Oyluhm(opts={}) {
                 }))
             })
 
+            if(!hawvtawchos.length) ready();
+
             Promise.all(hawvtawchos)
             .then(r=>{
-                console.log("HI!",a=r)
+                
                 r.forEach(q=>{
                     _loadedCheftawtseem[q[0]] = q[1]
                 })
@@ -429,8 +439,12 @@ function Oyluhm(opts={}) {
         } else done()
 
         function done() {
+            _started = true;
             setupShmeeyuh();
-            _readyQueue.forEach(q=>q());
+            _readyQueue.forEach(q=>{
+                q()
+            });
+
             _isReady = true;
             if(opts.html) {
                 AWTSMOOS.html(opts.html, parent)
@@ -909,7 +923,20 @@ function Oyluhm(opts={}) {
                 var attr = opts.attributes || opts.attr ||
                     opts.toyreem;
 
+                if(typeof(attr) == "object") {
+                    Object.keys(attr).forEach(q=>{
+                        el.setAttribute(q, attr[q]);
+                    })
+                }
+
+                var sty = opts.style || opts.toyreem;
                 
+                if(typeof(sty) == "object") {
+                    Object.keys(sty).forEach(k=>{
+                        el.style[k] = sty[k]
+                    })
+                    
+                }
                 var childElements = () => el.children;
                 var getChild = nm => {
                     if(typeof(nm) == "string")
@@ -948,7 +975,7 @@ function Oyluhm(opts={}) {
                     if(typeof(children) == "object") {
                         _chil = children
                     } else if(typeof(children) == "function") {
-                        _chil = children(getChild)
+                        _chil = children(getChild, el)
                     }
                     if(_chil) {
                         if(_chil.forEach) {
@@ -976,17 +1003,48 @@ function Oyluhm(opts={}) {
                     st(el, getChild)
                 }
 
-                if(typeof(attr) == "object") {
-                    Object.keys(attr).forEach(q=>{
-                        el.setAttribute(q, attr[q]);
-                    })
-                }
+                Array.from(childElements())
+                .forEach(c => {
+                    if(typeof(
+                        c.afterStart
+                    ) == "function") {
+                        c.afterStart(c, el)
+                    }
+                })
                 return el;
             }
         },
         Ayzareem: {
             
             get: ()=> ({
+                adjustTextToFit(textTolda, goyvuh/*customHeight*/) {
+                    var fontSize = 1;
+                    textTolda.style.fontSize=fontSize+"px";
+                    
+                    var tries = 0;
+                    console.log(
+                        textTolda.offsetWidth,
+                        textTolda.offsetHeight,
+                        textTolda.style.fontSize,
+                        goyvuh,
+                        "GOY"
+                    )
+                    while(
+                        textTolda.offsetHeight < 
+                        goyvuh &&
+                        textTolda.offsetWidth <
+                        goyvuh
+                        
+                        
+                    ) {
+                        
+                        tries++;
+                        
+                        fontSize++;
+                        textTolda.style.fontSize=fontSize+"px";
+                    }
+                },
+                  
                 fitRectGetScale/*just get scale to fit one rect to other*/(
                     rectSrc,rectDst
                 ) {
@@ -1157,6 +1215,95 @@ function Oyluhm(opts={}) {
                     x:0,y:0
                 }
 
+                var _html = opts.html;
+                this.dayuh = opts.dayuh||{};
+                if(typeof(this.dayuh) == "function") {
+                    this.dayuh = this.dayuh(this)
+                }
+                
+                
+                var htmlSheenooy = opts.htmlSheenooy ||
+                    opts.changedHTML ||
+                    opts.onhtmlchange;
+                
+
+                
+                Object.defineProperties(this, {
+                    radius: {
+                        get: () => Math.max
+                            (this.width,this.height)/2
+                    },
+                    spriteSheet: {
+                        get: () => _spriteSheet?
+                        _spriteSheet:null
+                    },
+                    scaler: {
+                        get: () => _scaler
+                    },
+                    cheftsuhOffset: {
+                        get: () => _cheftsuhOffset
+                    },
+                    cheftsuh: {
+                        get: () => {
+                            if(_cheftsuhInfo) {
+                                return _cheftsuhInfo;
+                            }
+                        }, set: v => {
+                            _cheftsuhInfo = v;
+                        }
+                    },
+                    updateHtml: {
+                        get: () => () => {
+                            if(!this.html) return;
+
+                            this.html.style.left = (
+                                this.x - this.width/2
+                                ) + "px";
+                                this.html.style.top = (
+                                this.y - this.height/2
+                                ) + "px";
+
+                                this.html.width = 
+                                this.html.style.width = 
+                                this.width;
+
+                            this.html.height = 
+                                this.html.style.height =
+                                this.height;
+                            
+                            
+                            //up(this.html)
+                            
+                        }
+                    },
+                    html: {
+                        get: () => _html,
+                        set: v => {
+                            if(typeof(v) == "function") {
+                                v = v(this)
+                            }
+
+                            if(
+                                typeof(v) == "object" ||
+                                typeof(v) == "string" && v
+                            ) {
+                            
+                                _html = AWTSMOOS.html(v)
+                                _html.style.position = "absolute"
+                                _html.style.display="block"
+                                if(
+                                    typeof(htmlSheenooy)
+                                    == "function"
+                                ) {
+                                    htmlSheenooy(_html)
+                                }
+                            }
+                            
+
+                        }
+                    }
+                })
+    
                 this.heesCheel = (me, olam) => {
                     var hees = opts.heesCheel ||
                     opts.start || null;
@@ -1232,64 +1379,46 @@ function Oyluhm(opts={}) {
                         
                     };
 
+                    this.html = _html;
+                    console.log(this.html,222,opts,opts.html,_html)
+                    if(this.html) {
+                        this.updateHtml()
+                    
+                        up(this.html)
+                    }
+                    
+                    
                     if(typeof(hees) == "function") {
                         hees(me, olam)
                     }
+
+                    
                 };
 
-                this.dayuh = opts.dayuh||{};
-                if(typeof(this.dayuh) == "function") {
-                    this.dayuh = this.dayuh(this)
-                }
-                var _html;
                 
-                Object.defineProperties(this, {
-                    radius: {
-                        get: () => Math.max
-                            (this.width,this.height)/2
-                    },
-                    spriteSheet: {
-                        get: () => _spriteSheet?
-                        _spriteSheet:null
-                    },
-                    scaler: {
-                        get: () => _scaler
-                    },
-                    cheftsuhOffset: {
-                        get: () => _cheftsuhOffset
-                    },
-                    cheftsuh: {
-                        get: () => {
-                            if(_cheftsuhInfo) {
-                                return _cheftsuhInfo;
-                            }
-                        }, set: v => {
-                            _cheftsuhInfo = v;
-                        }
-                    },
-                    html: {
-                        get: () => _html,
-                        set: v => {
-                            if(typeof(v) == "function") {
-                                v = v(this)
-                            }
 
-                            if(
-                                typeof(v) == "object" ||
-                                typeof(v) == "string" && v
-                            ) {
-                            
-                                _html = AWTSMOOS.html(v)
-                                _html.style.position = "absolute"
-                                _html.style.display="block"
-                            }
-                            
+                function getChange(html) {
+                    var ch = (
+                        html.change ||
+                        html.onchange ||
+                        html.onSheenooy
+                    )
+                    return typeof(ch) == "function"
+                        ? ch : null;
+                }
 
-                        }
-                    }
-                })
-
-                this.html = opts.html
+                function up(ht) {
+                    
+                    console.log(ht)
+                    var ch = getChange(ht);
+                    if(ch) ch(ht);
+                    Array.from(ht.children)
+                    .forEach(q=>{
+                        up(q)
+                    })
+                    
+                }
+                
             }
         },
         Gawshmeeyoos: {
@@ -1708,23 +1837,8 @@ function Oyluhm(opts={}) {
                             nivra._curSpriteFrame++;
 
                         }
+                        nivra.updateHtml()
 
-                        if(nivra.html) {
-                            nivra.html.style.left = (
-                                nivra.x - nivra.width/2
-                             ) + "px";
-                            nivra.html.style.top = (
-                                nivra.y - nivra.height/2
-                             ) + "px";
-
-                            nivra.html.width = 
-                                nivra.html.style.width = 
-                                nivra.width;
-
-                            nivra.html.height = 
-                                nivra.html.style.height =
-                                nivra.height;
-                        }
                         
                         
                     })
@@ -1735,161 +1849,4 @@ function Oyluhm(opts={}) {
         }
     })
     
-
-function getRotatedRectanglePoints(rect) {
-  let x = rect.x;
-  let y = rect.y;
-  let w = rect.width;
-  let h = rect.height;
-  let r = rect.rotation * Math.PI/180;
-
-  let x1 = x + (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
-  let y1 = y + (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
-
-  let x2 = x + (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
-  let y2 = y - (w/2) * Math.sin(r) + (h/2) * Math.cos(r);
-
-  let x3 = x - (w/2) * Math.cos(r) + (h/2) * Math.sin(r);
-  let y3 = y - (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
-
-  let x4 = x - (w/2) * Math.cos(r) - (h/2) * Math.sin(r);
-  let y4 = y + (w/2) * Math.sin(r) - (h/2) * Math.cos(r);
-
-  return [[x1,y1], [x2,y2], [x3,y3], [x4,y4]];
-}
-
-function detectLineCircleCollision(lineStart, lineEnd, circle) {
-  let x1 = lineStart[0];
-  let y1 = lineStart[1];
-  let x2 = lineEnd[0];
-  let y2 = lineEnd[1];
-
-  let cx = circle.x;
-  let cy = circle.y;
-  let r = circle.radius;
-    
-  let dx = x2 - x1;
-  let dy = y2 - y1;
-  let fx = x1 - cx;
-  let fy = y1 - cy;
-
-  let a = dx * dx + dy * dy;
-  let b = 2 * (fx * dx + fy * dy);
-  let c = fx * fx + fy * fy - r * r;
-
-  console.log(
-    "Hi ChatGPT, heres lineStart",
-    lineStart,"lineEnd",
-    lineEnd,"circle info:",{
-       x:circle.x,
-       y:circle.y,
-       radius:circle.radius
-    }
-  )
-  if (a <= 0.0000001) {
-    return false;
-  }
-
-  let discriminant = b * b - 4 * a * c;
-  if (discriminant < 0) {
-    return false;
-  }
-
-  let t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
-  let t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
-  if (t1 >= 0 && t1 <= 1 || t2 >= 0 && t2 <= 1) {
-    return true;
-  }
-  
-  return false;
-}   
-    
-function rotatePoint(x, y, centerX, centerY, angle) {
-    let newX = Math.cos(angle) * (x - centerX) - Math.sin(angle) * (y - centerY) + centerX;
-    let newY = Math.sin(angle) * (x - centerX) + Math.cos(angle) * (y - centerY) + centerY;
-    return {
-        x: newX,
-        y: newY
-    };
-}
-function isCircleIntersectingLine(circleX, circleY, circleRadius, lineX1, lineY1, lineX2, lineY2) {
-    // Find the closest point on the line to the center of the circle
-    const dx = lineX2 - lineX1;
-    const dy = lineY2 - lineY1;
-    const t = ((circleX - lineX1) * dx + (circleY - lineY1) * dy) / (dx * dx + dy * dy);
-    let closestX = lineX1 + t * dx;
-    let closestY = lineY1 + t * dy;
-
-    // If t is less than 0, the closest point is lineX1, lineY1
-    if (t < 0) {
-        closestX = lineX1;
-        closestY = lineY1;
-    }
-
-    // If t is greater than 1, the closest point is lineX2, lineY2
-    if (t > 1) {
-        closestX = lineX2;
-        closestY = lineY2;
-    }
-
-    // Check if the distance between the center of the circle and the closest point on the line is less than the radius of the circle
-    const distance = Math.sqrt((circleX - closestX) ** 2 + (circleY - closestY) ** 2);
-    return distance < circleRadius;
-}
-function isPointInsideRectangle(rectX, rectY, rectWidth, rectHeight, rectRotation, pointX, pointY) {
-    const rectCenterX = rectX + rectWidth / 2;
-    const rectCenterY = rectY + rectHeight / 2;
-
-    const unrotatedX = (pointX - rectCenterX)
-     * Math.cos(rectRotation) 
-    + (pointY - rectCenterY) 
-    * Math.sin(rectRotation)
-     + rectCenterX;
-
-    const unrotatedY = -(pointX - rectCenterX) 
-    * Math.sin(rectRotation) 
-    + (pointY - rectCenterY) 
-    * Math.cos(rectRotation) + rectCenterY;
-
-    if (
-        unrotatedX >= rectX && 
-        unrotatedX <= rectX + rectWidth && 
-        unrotatedY >= rectY && 
-        unrotatedY <= rectY + rectHeight
-    ) {
-        return true;
-    }
-
-    return false;
-}
-
-// Helper function to check if a point is within an oval
-function isPointInOval(x, y, oval) {
-    let ovalX = oval.x + oval.width / 2;
-    let ovalY = oval.y + oval.height / 2;
-    let halfWidth = oval.width / 2;
-    let halfHeight = oval.height / 2;
-    let normalizedX = (x - ovalX) / halfWidth;
-    let normalizedY = (y - ovalY) / halfHeight;
-    return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
-}
-function getDistance(x1, y1, x2, y2) {
-    let dx = x2 - x1;
-    let dy = y2 - y1;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  
-//check if a point is inside a circle
-function isPointInsideCircle(cx, cy, cradius, px, py) {
-    let distance = distanceBetweenPoints(cx, cy, px, py);
-    return distance <= cradius;
-  }
-  
-  //find the distance between two points
-  function distanceBetweenPoints(x1, y1, x2, y2) {
-    let dx = x2 - x1;
-    let dy = y2 - y1;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
 })()
