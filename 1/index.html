@@ -1,15 +1,22 @@
 B"H
 <br>
-<h4 id="awtsmoosLoyding">Welcome! Loading..<br>
+<h4 id="awtsmoosLoyding">Welcome! 
+    If you see this, there's
+    either and error or JavaScript is disabled.<br>
+    </h4>
     <div id="bar">
 
-    </div></h4>
+    </div>
 <script src="../awtsmoosGames.js"></script>
 <script>
- 
+    var chayfetsYesod/*
+        assets base URL
+    */ = "https://storage.googleapis.com/ckids-games.appspot.com/chawfawtseem/dawvening/";
+
+    awtsmoosLoyding.innerHTML = "Welcome! Loading..."
 
 
-    var questions = [];
+    var questions = null;
     var sprites = {};
 
     var ol = new Oyluhm({
@@ -65,7 +72,7 @@ B"H
             ]
         },
         chawfawtseem/*assets*/: {
-          player: "./assets/player.html"
+          player: chayfetsYesod + "player.html"
         },
         shtareem: [
             "questionReader.js"
@@ -80,20 +87,30 @@ B"H
                 console.log("got questions", questions)
             }
 
-            await olam.spritesheet("player", {
-                progress({total,current}) {
-                    var perc  = current/total
-                    bar.style.display="block"
-                    bar.style.background="cyan"
-                    bar.style.height=50
-                    bar.style.width = perc + (perc * 400)
-                    bar.innerHTML = current +"/"+total;
-                    bar.style.textAlign="center";
-                    console.log("There: ",perc);
-                }
-            })
+            try {
+                await olam.spritesheet("player", {
+                    progress({total,current}) {
+                        var perc  = current/total
+                        bar.style.display="block"
+                        bar.style.background="cyan"
+                        bar.style.height=50
+                        bar.style.width = perc + (perc * 400)
+                        bar.innerHTML = current +"/"+total;
+                        bar.style.textAlign="center";
+                    }
+                })
+                done()
+            } catch(e) {
+                done(e)
+            }
+           
+            function done(e) {
+                console.log("hi",e)
 
-            awtsmoosLoyding.parentNode.removeChild(awtsmoosLoyding)
+                awtsmoosLoyding.parentNode.removeChild(awtsmoosLoyding)
+                bar.parentNode.removeChild(bar)
+            }
+            
             
         },
         errors(er) {
@@ -360,9 +377,10 @@ B"H
         }
     })
 
-    var curQuestion = Math.floor(
+    var curQuestion = questions?
+    Math.floor(
         Math.random() * questions.length
-    )
+    ):"Hi"
 
     function awsayAwnawn() {
         var cloudRadius = 76 + Math.random() * 50;

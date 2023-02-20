@@ -155,7 +155,7 @@ function Oyluhm(opts={}) {
     var _spriteSheets = {};
 
     this.spritesheet = (cheftsaName, opts={}) => 
-    new Promise((r,j) => {
+    new Promise((done,j) => {
         
         if(
             typeof(cheftsaName) != "string" ||
@@ -181,7 +181,8 @@ function Oyluhm(opts={}) {
             totalHeight,
             totalWidth,
             collisionMask,
-            tseeyoor
+            tseeyoor,
+            tseeyooreem
         } = _loadedCheftawtseem[cheftsaName];
 
         
@@ -194,59 +195,53 @@ function Oyluhm(opts={}) {
         
         var total = rows*columns;
         var current = 0;
+        
      //   rows = 2
-    
-        fetch(tseeyoor)
-        .then(b=>b.blob())
-        .then((b) => {
-            for(
-                y = 0;
-                y < rows;
-                y++
-            ) {
-                for(
-                    x = 0;
-                    x < columns
-                    ;
-                    x++
-                ) {
-                    bitmapHawvtawchos.push(
-                        ((
-                            x, y, image,
-                            w,h
-                        ) => new Promise((r,j) =>{
-
-                                createImageBitmap(
-                                    image,
-                                    x,
-                                    y,
-                                    w, h
-                                ).then(bit=>{
-                                    if(progress) {
-                                        progress({
-                                            total,
-                                            current
-                                        })
-                                    }
-                                    current++;
-                                    r(bit)
-                                })
-                                .catch(j);
-
-
-                            })
-                        )(
-                            x * eachWidth,
-                            y * eachHeight,
-                            b,
-                            eachWidth,
-                            eachHeight
-                        )
-                    )
-                }
-            }
+        if(tseeyooreem) {
+            console.log("yes")
+            var imgHawvtachos = []
+         
+            tseeyooreem
+            .forEach(w=>{
+               
+                imgHawvtachos.push(
+                    ((q) => new Promise((r,j) =>{
+                        fetch(q)
+                        .then(b=>b.blob())
+                        .then(b=>{
+                           
+                            addSprite(b,true)
+                            r(b)
+                        })
+                    }))(w)
+                )
+                
+            })
+            Promise.all(imgHawvtachos)
+            .then(r=>{
+               
+                doBitmapPromises()
+            }).catch(e=>{
+                console.log("what?",e)
+            })
             
 
+            
+            
+        } else if(tseeyoor) {
+            fetch(tseeyoor)
+            .then(b=>b.blob())
+            .then((b) => {
+                addSprite(b);
+                doBitmapPromises()
+            })
+        } else {
+            done(null);
+        }
+
+        function doBitmapPromises() {
+            console.log(bitmapHawvtawchos.length)
+            if(bitmapHawvtawchos.length)
             Promise.all(
                 bitmapHawvtawchos
             ).then(q=> {
@@ -263,11 +258,91 @@ function Oyluhm(opts={}) {
                     totalWidth,
                     sprites
                 };
-                r(_spriteSheets[cheftsaName])
-            })
-        })
+                done(_spriteSheets[cheftsaName])
+            }).catch(e=>j(e))
+            else {
+                console.log("LOL")
+                done(null);
+            }
+        }
 
-        
+        function addSprite(b, isIndividual=false) {
+            var ymax = isIndividual ? rows-1 :0;
+            var xmax = isIndividual ? columns - 1:0
+
+            var multiplyFactor = isIndividual?1:0;
+            for(
+                y = ymax;
+                y < rows;
+                y++
+            ) {
+                for(
+                    x = xmax;
+                    x < columns
+                    ;
+                    x++
+                ) {
+                    bitmapHawvtawchos.push(
+                        ((
+                            x, 
+                            y, 
+                            image,
+                            w,
+                            h
+                        ) => new Promise((r,j) =>{
+
+                                (  
+                                    isIndividual?
+                                    createImageBitmap(
+                                        image 
+                                    ) :
+                                    createImageBitmap(
+                                        image,
+                                        x,
+                                        y,
+                                        w, 
+                                        h
+                                    )
+                                ).then(bit=>{
+                                    if(progress) {
+                                        progress({
+                                            total,
+                                            current
+                                        })
+                                    }
+                                    current++;
+                                    r(bit)
+                                })
+                                .catch(j);
+
+
+                            })
+                        )(
+                            
+                            x 
+                            * eachWidth,
+
+                            
+                            
+                            y 
+                            * eachHeight,
+                            b,
+
+                            
+                            
+                            eachWidth,
+
+                            
+                            
+                            eachHeight
+                        )
+                    )
+                }
+            }
+            
+
+            
+        }
 
         
         
@@ -361,22 +436,27 @@ function Oyluhm(opts={}) {
                 }))
             })
 
-            if(!hawvtawchos.length) ready();
-
-            Promise.all(hawvtawchos)
-            .then(r=>{
-                
-                r.forEach(q=>{
-                    _loadedCheftawtseem[q[0]] = q[1]
+            if(!hawvtawchos.length) {
+                ready();
+            } else {
+                Promise.all(hawvtawchos)
+                .then(r=>{
+                    
+                    r.forEach(q=>{
+                        _loadedCheftawtseem[q[0]] = q[1]
+                    })
+                    ready()
+                }).catch(e=>{
+                    console.log("er,",e)
+                    ready()
                 })
-                ready()
-            }).catch(e=>{
-                console.log("er,",e)
-                ready()
-            })
+            }
+
+            
         }
     }
     function ready() {
+        console.log("ready!")
         var errorFnc = opts.errors ||
             opts.onErrors;
         var errors = []
@@ -1018,6 +1098,14 @@ function Oyluhm(opts={}) {
             
             get: ()=> ({
                 adjustTextToFit(textTolda, goyvuh/*customHeight*/) {
+                    if(
+                        !textTolda.innerHTML ||
+                        !textTolda.innerText ||
+                        !textTolda.offsetWidth ||
+                        !textTolda.offsetHeight
+                    ) {
+                        return;
+                    }
                     var fontSize = 1;
                     textTolda.style.fontSize=fontSize+"px";
                     
@@ -1380,7 +1468,7 @@ function Oyluhm(opts={}) {
                     };
 
                     this.html = _html;
-                    console.log(this.html,222,opts,opts.html,_html)
+                   // console.log(this.html,222,opts,opts.html,_html)
                     if(this.html) {
                         this.updateHtml()
                     
@@ -1408,8 +1496,7 @@ function Oyluhm(opts={}) {
                 }
 
                 function up(ht) {
-                    
-                    console.log(ht)
+
                     var ch = getChange(ht);
                     if(ch) ch(ht);
                     Array.from(ht.children)
@@ -1711,15 +1798,14 @@ function Oyluhm(opts={}) {
                         
                         
 
-                        if(nivra.spriteSheet) {
-                            
-                            if(!olam.spriteSheets[
+                        if(
+                            nivra.spriteSheet
+                            && 
+                            olam.spriteSheets[
                                 nivra.spriteSheet
-                            ]) {
-                               // console.log(444)
-                                return;
-                            }
-
+                            ]
+                        ) {
+                            
                             if(
                                 typeof(nivra._curSpriteFrame)
                                 != "number"
@@ -1755,6 +1841,7 @@ function Oyluhm(opts={}) {
                             //offsetY -= sch/2
                             //offsetX += scw/2
                             if(collisionMask) {
+                               
                                 var cmx = collisionMask.x
                                     *nivra.scaler
 
@@ -1805,37 +1892,44 @@ function Oyluhm(opts={}) {
                                 ,
                                 sch
                             )
-
+                            var curSprite = sprites[
+                                nivra._curSpriteFrame % rows
+                            ]
+                            if(curSprite) {
+                               
+                                olam.ctx.drawImage(
+                                    curSprite, 
+                                   /* 0,
+                                    0,//get back to row logic later
+                                    eachWidth,
+                                    eachHeight,
+                                    */
+                                    spriteX+offsetX
+                                       // +nivra.cheftsuhOffset.x
+                                       ,
+                                    spriteY+offsetY
+                                        //+nivra.cheftsuhOffset.y
+                                    //0,0
+    
+                                    ,
+                                    scw
+                                    ,
+                                    sch
+                                    
+                                    
+                                )
+                            } else {
+                                console.log("no im?")
+                            }
                             
-                            olam.ctx.drawImage(
-                                sprites[
-                                    nivra._curSpriteFrame % rows
-                                ], 
-                                0,
-                                0,//get back to row logic later
-                                eachWidth,
-                                eachHeight,
-                                
-                                spriteX+offsetX
-                                   // +nivra.cheftsuhOffset.x
-                                   ,
-                                spriteY+offsetY
-                                    //+nivra.cheftsuhOffset.y
-                                //0,0
-
-                                ,
-                                scw
-                                ,
-                                sch
-                                
-                                
-                            )
 
                             olam.ctx.strokeStyle="yellow";
 
 
                             nivra._curSpriteFrame++;
 
+                        } else {
+                           
                         }
                         nivra.updateHtml()
 

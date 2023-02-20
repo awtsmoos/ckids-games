@@ -36,6 +36,9 @@
     var cols = 7;
     var rowImgs = []
     
+    var imgURLs = [];
+    var rd = new FileReader();
+
     chooser.onchange = e=>{
         imgs = Array.from(chooser.files)
         
@@ -48,6 +51,14 @@
                         .then(r=>r.blob())
                         .then(u=>{
                             var url = URL.createObjectURL(u)
+
+                            imgURLs.push(new Promise((rs,rj) => {
+                                rd.onloaded = () => {
+                                    rs(rd.result)
+                                };
+                                rd.readAsDataURL(u)
+                            }));
+
                             var img = document.createElement("img")
                             //console.log("HI!",q,img,url)
                             img.onload = () => {
